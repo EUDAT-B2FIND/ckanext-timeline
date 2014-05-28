@@ -2,7 +2,14 @@ $(function () {
     $('#big-chart').highcharts({
         chart: {
             type: 'line',
-            zoomType: 'x'
+            zoomType: 'x',
+            events: {
+                selection: function (event) {
+                    if (event.xAxis) {
+                        console.log("Big", event.xAxis[0].min, event.xAxis[0].max);
+                    }
+                }
+            }
         },
         title: {
             text: 'Datasets relative to time'
@@ -24,20 +31,32 @@ $(function () {
                 data: helpers.generateRandomData(-100, 100)
             }
         ],
-        /** Don't show credits link */
-        credits: {
-            enabled: false
+        plotOptions: {
+            series: {
+//                marker: { enabled: false },
+                allowPointSelect: true
+            }
         },
+        /** Don't show credits link */
+        credits: { enabled: false },
         /** Don't show legend at bottom */
-        legend: {
-            enabled: false
-        }
+        legend: { enabled: false }
     });
 
     $('#small-chart').highcharts({
         chart: {
             type: 'line',
-            zoomType: 'x'
+            zoomType: 'x',
+            spacingLeft: 60,
+            events: {
+                selection: function (event) {
+                    if (event.xAxis) {
+                        console.log("Small", event.xAxis[0].min, event.xAxis[0].max);
+                        $('#big-chart').highcharts().series[0].setData(helpers.generateRandomData(-100, 100));
+                    }
+                    event.preventDefault()
+                }
+            }
         },
         title: { text: null },
         xAxis: {
@@ -51,12 +70,13 @@ $(function () {
         series: [
             {
                 name: 'Datasets',
-                data: helpers.generateRandomData(-100, 100)
+                data: helpers.generateRandomData(-300, 1000)
             }
         ],
         plotOptions: {
             series: {
-                marker: { enabled: false }
+                marker: { enabled: false },
+                enableMouseTracking: false
             }
         },
         tooltip: { enabled: false },
