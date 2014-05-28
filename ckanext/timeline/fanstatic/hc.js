@@ -6,8 +6,14 @@ $(function () {
             events: {
                 selection: function (event) {
                     if (event.xAxis) {
-                        console.log("Big", event.xAxis[0].min, event.xAxis[0].max);
+                        var min = event.xAxis[0].min;
+                        var max = event.xAxis[0].max;
+                        console.log("Big", min, max);
+
+                        /** Update big-chart with new values */
+                        this.series[0].setData(helpers.generateRandomData(min, 100));
                     }
+                    event.preventDefault()
                 }
             }
         },
@@ -23,7 +29,8 @@ $(function () {
         yAxis: {
             title: {
                 text: 'Datasets'
-            }
+            },
+            min: 0
         },
         series: [
             {
@@ -51,8 +58,21 @@ $(function () {
             events: {
                 selection: function (event) {
                     if (event.xAxis) {
-                        console.log("Small", event.xAxis[0].min, event.xAxis[0].max);
-                        $('#big-chart').highcharts().series[0].setData(helpers.generateRandomData(-100, 100));
+                        var min = event.xAxis[0].min;
+                        var max = event.xAxis[0].max;
+                        console.log("Small", min, max);
+
+                        /** Update big-chart with new values */
+                        $('#big-chart').highcharts().series[0].setData(helpers.generateRandomData(min, 100));
+
+                        /** Apply mask on y-axis */
+                        this.xAxis[0].removePlotBand('mask');
+                        this.xAxis[0].addPlotBand({
+                            id: 'mask',
+                            from: min,
+                            to: max,
+                            color: 'rgba(0, 0, 0, 0.2)'
+                        });
                     }
                     event.preventDefault()
                 }
@@ -65,7 +85,8 @@ $(function () {
         },
         yAxis: {
             title: { enabled: false },
-            labels: { enabled: false }
+            labels: { enabled: false },
+            min: 0
         },
         series: [
             {
@@ -81,7 +102,7 @@ $(function () {
         },
         tooltip: { enabled: false },
         /** Don't show credits link */
-        credits: { enabled: false },
+//        credits: { enabled: false },
         /** Don't show legend at bottom */
         legend: { enabled: false }
     });
@@ -131,7 +152,13 @@ helpers.getRandomInt = function (min, max) {
 /** Generates some random data for diagram */
 helpers.generateRandomData = function (stime, n) {
     var data = [];
-    var start = moment.utc([stime]).valueOf();
+    var start;
+
+    if (stime < -1000 || stime > 2500) {
+        start = stime;
+    } else {
+        start = moment.utc([stime]).valueOf();
+    }
 
     for (var i = 0; i < n; i++) {
         data.push([
