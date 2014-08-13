@@ -52,7 +52,11 @@ def timeline(context, request_data):
 
     ls = set()
     for a in range(100):
-        ls.add((int(start + interval * a), int(start + interval * (a + 1))))
+        s = int(start + interval * a)
+        e = int(start + interval * (a + 1))
+        m = (s + e) / 2
+        if s != e:
+            ls.add((s, e, m))
 
     if len(ls) != 100:
         log.warning('{} not 100 elements'.format(len(ls)))
