@@ -26,8 +26,8 @@ def timeline(context, request_data):
     :rtype: dictionary
     '''
 
-    log.debug("context: {}".format(context))
-    log.debug("request_data: {}".format(request_data))
+    log.debug('context: {c}'.format(c=context))
+    log.debug('request_data: {r}'.format(r=request_data))
 
     #ckan.logic.check_access("timeline", context, request_data)
 
@@ -45,10 +45,10 @@ def timeline(context, request_data):
         raise ckan.logic.ValidationError({'end': _('Smaller or equal to start')})
 
     delta = float(end - start)
-    log.debug("delta: {}".format(delta))
+    log.debug('delta: {d}'.format(d=delta))
 
     interval = delta / 100
-    log.debug("interval: {}".format(interval))
+    log.debug('interval: {i}'.format(i=interval))
 
     ls = set()
     for a in range(100):
@@ -59,9 +59,9 @@ def timeline(context, request_data):
             ls.add((s, e, m))
 
     if len(ls) != 100:
-        log.warning('{} not 100 elements'.format(len(ls)))
+        log.warning('{l} not 100 elements'.format(l=len(ls)))
 
     ls = sorted(list(ls))
-    log.debug("ls: {}".format(ls))
+    #log.debug("ls: {l}".format(l=ls))
 
     return ls
