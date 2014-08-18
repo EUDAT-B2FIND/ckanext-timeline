@@ -2,6 +2,8 @@ import logging
 
 import ckan.plugins as plugins
 import ckan.logic
+import ckan.lib.search
+import ckan.lib.search.query
 from ckan.common import _
 
 log = logging.getLogger(__name__)
@@ -64,4 +66,13 @@ def timeline(context, request_data):
     ls = sorted(list(ls))
     #log.debug("ls: {l}".format(l=ls))
 
-    return ls
+    solr = ckan.lib.search.make_connection()
+
+    rl = []
+    for s, e, m in ls:
+        r = solr.query('TempCoverageBegin:[{s} TO {e}] OR TempCoverageEnd:[{s} TO {e}]'.format(s=s, e=e))
+        rl.append((s, e, m, len(r)))
+
+    solr.close()
+
+    return rl
