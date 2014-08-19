@@ -13,7 +13,7 @@ class TimelineAPIPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.interfaces.IActions, inherit=True)
 
     def get_actions(self):
-        return {"timeline": timeline}
+        return {'timeline': timeline}
 
 @ckan.logic.side_effect_free
 def timeline(context, request_data):
@@ -31,7 +31,7 @@ def timeline(context, request_data):
     log.debug('context: {c}'.format(c=context))
     log.debug('request_data: {r}'.format(r=request_data))
 
-    #ckan.logic.check_access("timeline", context, request_data)
+    #ckan.logic.check_access('timeline', context, request_data)
 
     start = request_data.get('start')
     end = request_data.get('end')
@@ -64,7 +64,7 @@ def timeline(context, request_data):
         log.warning('{l} not 100 elements'.format(l=len(ls)))
 
     ls = sorted(list(ls))
-    #log.debug("ls: {l}".format(l=ls))
+    # log.debug('ls: {l}'.format(l=ls))
 
     solr = ckan.lib.search.make_connection()
 
