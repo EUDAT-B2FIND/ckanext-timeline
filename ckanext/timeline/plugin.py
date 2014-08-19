@@ -71,7 +71,7 @@ def timeline(context, request_data):
     rl = []
     for s, e, m in ls:
         r = solr.query('TempCoverageBegin:[* TO {e}] AND TempCoverageEnd:[{s} TO *]'.format(s=s, e=e))
-        rl.append((s, e, m, len(r)))
+        rl.append((s, e, m, r._numFound))
 
     solr.close()
 
