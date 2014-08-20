@@ -25,7 +25,7 @@ def timeline(context, request_data):
     :param end: the end point in time
     :type end: int
 
-    :rtype: dictionary
+    :rtype: list
     '''
 
     log.debug('context: {c}'.format(c=context))
