@@ -1,6 +1,9 @@
 from __future__ import absolute_import, with_statement, print_function, generators, nested_scopes, unicode_literals
 
 import logging
+import threading
+import multiprocessing
+from urllib2 import urlopen
 
 import ckan.plugins as plugins
 import ckan.logic
@@ -77,7 +80,18 @@ def timeline(context, request_data):
     # log.debug('ls: {l}'.format(l=ls))
 
     rl = []
-    [rl.append(ps(l)) for l in ls]
+
+    if method == 't':
+        log.debug('Method: threading')
+        t = [threading.Thread(target=lambda st, en, md: rl.append(ps((st, en, md))), args=l) for l in ls]
+        [x.start() for x in t]
+        [x.join() for x in t]
+    elif method == 'p':
+        log.debug('Method: multiprocessing')
+        rl = multiprocessing.Pool(multiprocessing.cpu_count()).map(ps, ls)
+    elif method == 's':
+        log.debug('Method: sequential')
+        [rl.append(ps(l)) for l in ls]
 
     return sorted(rl)
 
