@@ -1,3 +1,5 @@
+from __future__ import absolute_import, with_statement, print_function, generators, nested_scopes, unicode_literals
+
 import logging
 
 import ckan.plugins as plugins
