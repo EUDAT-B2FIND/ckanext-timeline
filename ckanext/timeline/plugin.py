@@ -70,7 +70,7 @@ def timeline(context, request_data):
     if len(ls) != 100:
         log.warning('{l} not 100 elements'.format(l=len(ls)))
 
-    ls = sorted(list(ls))
+    ls = list(ls)
     # log.debug('ls: {l}'.format(l=ls))
 
     solr = ckan.lib.search.make_connection()
@@ -84,4 +84,4 @@ def timeline(context, request_data):
 
     solr.close()
 
-    return rl
+    return sorted(rl)
