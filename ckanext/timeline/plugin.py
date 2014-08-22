@@ -79,10 +79,11 @@ def timeline(context, request_data):
     ls = list(ls)
     # log.debug('ls: {l}'.format(l=ls))
 
-    rl = []
 
     if method == 't':
         log.debug('Method: threading')
+        # TODO: Would collections.deque be faster and/or thread-safer?
+        rl = []
         t = [threading.Thread(target=lambda st, en, md: rl.append(ps((st, en, md))), args=l) for l in ls]
         [x.start() for x in t]
         [x.join() for x in t]
@@ -91,7 +92,7 @@ def timeline(context, request_data):
         rl = multiprocessing.Pool(multiprocessing.cpu_count()).map(ps, ls)
     elif method == 's':
         log.debug('Method: sequential')
-        [rl.append(ps(l)) for l in ls]
+        rl = [ps(l) for l in ls]
 
     return sorted(rl)
 
