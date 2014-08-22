@@ -10,6 +10,9 @@ from ckan.common import _
 
 log = logging.getLogger(__name__)
 
+HOST = 'http://localhost:8983/solr'
+QUERY = 'extras_TempCoverageBegin:[* TO {e}] AND extras_TempCoverageEnd:[{s} TO *]'
+
 
 class TimelineAPIPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.interfaces.IActions, inherit=True)
@@ -77,7 +80,7 @@ def timeline(context, request_data):
 
     rl = []
     for s, e, m in ls:
-        r = solr.select('extras_TempCoverageBegin:[* TO {e}] AND extras_TempCoverageEnd:[{s} TO *]'.format(s=s, e=e),
+        r = solr.select(QUERY.format(s=s, e=e),
                         fields=['id'],
                         rows=0)
         rl.append((s, e, m, r._numFound))
