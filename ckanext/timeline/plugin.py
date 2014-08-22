@@ -26,6 +26,8 @@ def timeline(context, request_data):
     :type start: int
     :param end: the end point in time
     :type end: int
+    :param method: the way to execute the queries
+    :type method: str
 
     :rtype: list
     '''
@@ -37,11 +39,14 @@ def timeline(context, request_data):
 
     start = request_data.get('start')
     end = request_data.get('end')
+    method = request_data.get('method', 't')
 
     if start is None:
         raise ckan.logic.ValidationError({'start': _('Missing value')})
     if end is None:
         raise ckan.logic.ValidationError({'end': _('Missing value')})
+    if method not in ('s', 'p', 't'):
+        raise ckan.logic.ValidationError({'method': _('Wrong value')})
 
     start = int(start)
     end = int(end)
