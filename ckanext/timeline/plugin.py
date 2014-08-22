@@ -76,15 +76,16 @@ def timeline(context, request_data):
     ls = list(ls)
     # log.debug('ls: {l}'.format(l=ls))
 
-    solr = ckan.lib.search.make_connection()
-
     rl = []
-    for s, e, m in ls:
-        r = solr.select(QUERY.format(s=s, e=e),
-                        fields=['id'],
-                        rows=0)
-        rl.append((s, e, m, r._numFound))
-
-    solr.close()
+    [rl.append(ps(l)) for l in ls]
 
     return sorted(rl)
+
+
+def ps((s, e, m)):
+    solr = ckan.lib.search.make_connection()
+    n = solr.select(QUERY.format(s=s, e=e),
+                    fields=['id'],
+                    rows=0)
+    solr.close()
+    return s, e, m, n._numFound
