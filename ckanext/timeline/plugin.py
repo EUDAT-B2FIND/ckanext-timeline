@@ -55,11 +55,35 @@ def timeline(context, request_data):
         raise ckan.logic.ValidationError({'end': _('Missing value')})
     if method not in ('s', 'p', 't'):
         raise ckan.logic.ValidationError({'method': _('Wrong value')})
+    if start == '*':
+        try:
+            c = ckan.lib.search.make_connection()
+            start = c.select('*:*',
+                             fields=['id', '{f}'.format(f=START_FIELD)],
+                             sort=['{f} asc'.format(f=START_FIELD)],
+                             rows=1).results[0][START_FIELD]
+        except:
+            raise ckan.logic.ValidationError({'start': _('Could not find start value from Solr')})
+        finally:
+            c.close()
+    if end == '*':
+        try:
+            c = ckan.lib.search.make_connection()
+            end = c.select('*:*',
+                           fields=['id', '{f}'.format(f=END_FIELD)],
+                           sort=['{f} desc'.format(f=END_FIELD)],
+                           rows=1).results[0][END_FIELD]
+        except:
+            raise ckan.logic.ValidationError({'end': _('Could not find end value from Solr')})
+        finally:
+            c.close()
 
     start = int(start)
     end = int(end)
     if end <= start:
         raise ckan.logic.ValidationError({'end': _('Smaller or equal to start')})
+    log.debug('start: {}'.format(start))
+    log.debug('end: {}'.format(end))
 
     delta = float(end - start)
     log.debug('delta: {d}'.format(d=delta))
