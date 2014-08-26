@@ -82,8 +82,8 @@ def timeline(context, request_data):
     end = int(end)
     if end <= start:
         raise ckan.logic.ValidationError({'end': _('Smaller or equal to start')})
-    log.debug('start: {}'.format(start))
-    log.debug('end: {}'.format(end))
+    log.debug('start: {0}'.format(start))
+    log.debug('end: {0}'.format(end))
 
     delta = float(end - start)
     log.debug('delta: {d}'.format(d=delta))
