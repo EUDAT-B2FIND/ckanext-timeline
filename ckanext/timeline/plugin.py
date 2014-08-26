@@ -15,6 +15,8 @@ log = logging.getLogger(__name__)
 
 HOST = 'http://localhost:8983/solr'
 QUERY = 'extras_TempCoverageBegin:[* TO {e}] AND extras_TempCoverageEnd:[{s} TO *]'
+START_FIELD = 'extras_TempCoverageBegin'
+END_FIELD = 'extras_TempCoverageEnd'
 
 
 class TimelineAPIPlugin(plugins.SingletonPlugin):
