@@ -1,3 +1,5 @@
+const samples = 100;
+
 $(function () {
     $('#big-chart').highcharts({
         chart: {
@@ -11,8 +13,9 @@ $(function () {
                         console.log("Big", min, max);
 
                         /** Update big-chart with new values */
-                        this.series[0].setData(helpers.generateRandomData(min, 100));
+                        this.series[0].setData(helpers.generateRandomDataEnd(min, max, samples));
                     }
+                    /** Disables visual zooming */
                     event.preventDefault()
                 }
             }
@@ -22,6 +25,7 @@ $(function () {
         },
         xAxis: {
             type: 'datetime',
+            minRange: samples * 1000,
             title: {
                 text: 'Time'
             }
@@ -35,13 +39,16 @@ $(function () {
         series: [
             {
                 name: 'Datasets',
-                data: helpers.generateRandomData(-100, 100)
+                /** Stupid random start values */
+                data: helpers.generateRandomData(-100, samples)
             }
         ],
         plotOptions: {
             series: {
 //                marker: { enabled: false },
-                allowPointSelect: true
+                /** Hides the line */
+//                lineWidth: 0,
+                allowPointSelect: true,
             }
         },
         /** Don't show credits link */
@@ -63,7 +70,7 @@ $(function () {
                         console.log("Small", min, max);
 
                         /** Update big-chart with new values */
-                        $('#big-chart').highcharts().series[0].setData(helpers.generateRandomData(min, 100));
+                        $('#big-chart').highcharts().series[0].setData(helpers.generateRandomDataEnd(min, max, samples));
 
                         /** Apply mask on y-axis */
                         this.xAxis[0].removePlotBand('mask');
@@ -91,6 +98,7 @@ $(function () {
         series: [
             {
                 name: 'Datasets',
+                /** Stupid random start values */
                 data: helpers.generateRandomData(-300, 1000)
             }
         ],
@@ -160,9 +168,30 @@ helpers.generateRandomData = function (stime, n) {
         start = moment.utc([stime]).valueOf();
     }
 
+    const min = helpers.sToMs(helpers.week);
+    const max = helpers.sToMs(helpers.year);
+
     for (var i = 0; i < n; i++) {
         data.push([
-            start += helpers.getRandomInt(helpers.sToMs(helpers.week), helpers.sToMs(helpers.year)),
+            start += helpers.getRandomInt(min, max),
+            helpers.getRandomInt(0, 20)
+        ]);
+    }
+
+    return data
+};
+
+/** Generates some random data for diagram */
+helpers.generateRandomDataEnd = function (stime, etime, n) {
+    var data = [];
+
+    console.log(stime, etime, n);
+    const step = (etime - stime) / n;
+    console.log("step = ", step);
+
+    for (var i = 0, start = stime; i < n; i++) {
+        data.push([
+            start += step,
             helpers.getRandomInt(0, 20)
         ]);
     }
