@@ -22,7 +22,17 @@ $(function () {
                         console.log("Big", min, max);
 
                         /** Update big-chart with new values */
-                        this.series[0].setData(helpers.generateRandomDataEnd(min, max, samples));
+                        $.getJSON(api_url,
+                            {
+                                start: parseInt(helpers.unixAsZeroBased(helpers.msToS(min))),
+                                end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max)))
+                            },
+                            function (data) {
+                                $('#big-chart').highcharts().series[0].setData(
+                                    data.result.map(function (x) {
+                                        return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]]
+                                }));
+                        });
                     }
                     /** Disables visual zooming */
                     event.preventDefault()
