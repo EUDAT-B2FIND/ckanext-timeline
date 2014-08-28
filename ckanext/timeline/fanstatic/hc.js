@@ -93,7 +93,17 @@ $(function () {
                         console.log("Small chart: ", min, max);
 
                         /** Update big-chart with new values */
-                        $('#big-chart').highcharts().series[0].setData(helpers.generateRandomDataEnd(min, max, samples));
+                        $.getJSON(api_url,
+                            {
+                                start: parseInt(helpers.unixAsZeroBased(helpers.msToS(min))),
+                                end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max)))
+                            },
+                            function (data) {
+                                big_chart_data = data.result.map(function (x) {
+                                    return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]]
+                                })
+                                $('#big-chart').highcharts().series[0].setData(shallow_copy(big_chart_data));
+                        });
 
                         /** Apply mask on y-axis */
                         this.xAxis[0].removePlotBand('mask');
