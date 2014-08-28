@@ -1,5 +1,14 @@
 const samples = 100;
 
+/** Contains the data for the big chart */
+var big_chart_data;
+
+/** Contains the data for the small chart */
+var small_chart_data;
+
+/** Contains the URL for the CKAN API */
+const api_url = "http://eudat6a.dkrz.de/api/3/action/timeline"
+
 $(function () {
     $('#big-chart').highcharts({
         chart: {
