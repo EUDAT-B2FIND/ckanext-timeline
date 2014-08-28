@@ -34,8 +34,12 @@ $(function () {
                                 }));
                         });
                     }
+                    else if (event.resetSelection) {
+                        console.log("Reset: ", event);
+                        $('#big-chart').highcharts().series[0].setData(shallow_copy(big_chart_data));
+                    }
                     /** Disables visual zooming */
-                    event.preventDefault()
+                    // event.preventDefault();
                 }
             }
         },
