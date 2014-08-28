@@ -142,6 +142,11 @@ helpers.zeroBasedAsUnix = function (zb) {
     return helpers.yearZero.unix() + Number(zb)
 };
 
+/** ux should be seconds from Year 1970 (Epoch) in UTC, as Number or String */
+helpers.unixAsZeroBased = function (ux) {
+    return Number(ux) - helpers.yearZero.unix()
+};
+
 /** Converts milliseconds to seconds */
 helpers.msToS = function (ms) {
     return ms / 1000
