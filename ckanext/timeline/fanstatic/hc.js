@@ -19,7 +19,7 @@ $(function () {
                     if (event.xAxis) {
                         var min = event.xAxis[0].min;
                         var max = event.xAxis[0].max;
-                        console.log("Big", min, max);
+                        console.log("Big chart: ", min, max);
 
                         /** Update big-chart with new values */
                         $.getJSON(api_url,
@@ -68,9 +68,9 @@ $(function () {
         ],
         plotOptions: {
             series: {
-//                marker: { enabled: false },
+                // marker: { enabled: false },
                 /** Hides the line */
-//                lineWidth: 0,
+                // lineWidth: 0,
                 allowPointSelect: true,
             }
         },
@@ -90,7 +90,7 @@ $(function () {
                     if (event.xAxis) {
                         var min = event.xAxis[0].min;
                         var max = event.xAxis[0].max;
-                        console.log("Small", min, max);
+                        console.log("Small chart: ", min, max);
 
                         /** Update big-chart with new values */
                         $('#big-chart').highcharts().series[0].setData(helpers.generateRandomDataEnd(min, max, samples));
@@ -133,15 +133,9 @@ $(function () {
         },
         tooltip: { enabled: false },
         /** Don't show credits link */
-//        credits: { enabled: false },
+        // credits: { enabled: false },
         /** Don't show legend at bottom */
         legend: { enabled: false }
-    });
-
-    /** Get JSON data from CKAN API */
-    $.getJSON("http://eudat6a.dkrz.de/api/timegraph?start=x&end=y", function (data) {
-        options.series[0].data = data;
-        var chart = new Highcharts.Chart(options);
     });
 });
 
@@ -270,7 +264,7 @@ function convertSecondsToHuman(seconds) {
     rest = (rest % helpers.minute);
 
     human += calcToHuman(rest, helpers.second, "s");
-//    rest = (rest % helpers.second);
+    // rest = (rest % helpers.second);
 
     return human + " " + era;
 }
