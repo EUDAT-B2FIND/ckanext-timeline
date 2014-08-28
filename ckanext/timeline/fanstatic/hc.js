@@ -246,3 +246,8 @@ function convertSecondsToHuman(seconds) {
 
     return human + " " + era;
 }
+
+/** Creates a shallow copy of an array */
+function shallow_copy(array) {
+  return array.slice(0)
+}
