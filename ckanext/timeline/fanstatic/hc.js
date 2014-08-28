@@ -63,7 +63,7 @@ $(function () {
             {
                 name: 'Datasets',
                 /** Stupid random start values */
-                data: helpers.generateRandomData(-100, samples)
+                // data: helpers.generateRandomData(-100, samples)
             }
         ],
         plotOptions: {
