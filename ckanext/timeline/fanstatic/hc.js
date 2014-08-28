@@ -138,8 +138,8 @@ helpers.month = 30 * helpers.day;
 helpers.year = 12 * helpers.month;
 
 /** zb should be seconds from Year 0 in UTC, as Number or String */
-helpers.zeroBasedAsMoment = function (zb) {
-    return moment.unix(helpers.yearZero.unix() + Number(zb))
+helpers.zeroBasedAsUnix = function (zb) {
+    return helpers.yearZero.unix() + Number(zb)
 };
 
 /** Converts milliseconds to seconds */
