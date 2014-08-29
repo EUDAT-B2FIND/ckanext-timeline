@@ -84,72 +84,86 @@ $(function () {
         legend: { enabled: false }
     });
 
-    $('#small-chart').highcharts({
-        chart: {
-            type: 'line',
-            zoomType: 'x',
-            spacingLeft: 60,
-            events: {
-                selection: function (event) {
-                    if (event.xAxis) {
-                        var min = event.xAxis[0].min;
-                        var max = event.xAxis[0].max;
-                        console.log("Small chart: ", min, max);
+    $.getJSON(api_url,
+        {
+            start: '*',
+            end: '*'
+        },
+        function (data) {
+            small_chart_data = data.result.map(function (x) {
+                return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]]
+            });
 
-                        /** Update big-chart with new values */
-                        $.getJSON(api_url,
-                            {
-                                start: parseInt(helpers.unixAsZeroBased(helpers.msToS(min))),
-                                end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max)))
-                            },
-                            function (data) {
-                                big_chart_data = data.result.map(function (x) {
-                                    return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]]
-                                })
-                                $('#big-chart').highcharts().series[0].setData(shallow_copy(big_chart_data));
-                        });
+        $('#small-chart').highcharts({
+            chart: {
+                type: 'line',
+                // type: 'area',
+                // type: 'column',
+                // type: 'spline',
+                zoomType: 'x',
+                spacingLeft: 60,
+                events: {
+                    selection: function (event) {
+                        if (event.xAxis) {
+                            var min = event.xAxis[0].min;
+                            var max = event.xAxis[0].max;
+                            console.log("Small chart: ", min, max);
 
-                        /** Apply mask on y-axis */
-                        this.xAxis[0].removePlotBand('mask');
-                        this.xAxis[0].addPlotBand({
-                            id: 'mask',
-                            from: min,
-                            to: max,
-                            color: 'rgba(0, 0, 0, 0.2)'
-                        });
+                            /** Update big-chart with new values */
+                            $.getJSON(api_url,
+                                {
+                                    start: parseInt(helpers.unixAsZeroBased(helpers.msToS(min))),
+                                    end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max)))
+                                },
+                                function (data) {
+                                    big_chart_data = data.result.map(function (x) {
+                                        return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]]
+                                    })
+                                    $('#big-chart').highcharts().series[0].setData(shallow_copy(big_chart_data));
+                            });
+
+                            /** Apply mask on y-axis */
+                            this.xAxis[0].removePlotBand('mask');
+                            this.xAxis[0].addPlotBand({
+                                id: 'mask',
+                                from: min,
+                                to: max,
+                                color: 'rgba(0, 0, 0, 0.2)'
+                            });
+                        }
+                        event.preventDefault()
                     }
-                    event.preventDefault()
                 }
-            }
-        },
-        title: { text: null },
-        xAxis: {
-            type: 'datetime',
-            title: { enabled: false }
-        },
-        yAxis: {
-            title: { enabled: false },
-            labels: { enabled: false },
-            min: 0
-        },
-        series: [
-            {
-                name: 'Datasets',
-                /** Stupid random start values */
-                data: helpers.generateRandomData(-300, 1000)
-            }
-        ],
-        plotOptions: {
-            series: {
-                marker: { enabled: false },
-                enableMouseTracking: false
-            }
-        },
-        tooltip: { enabled: false },
-        /** Don't show credits link */
-        // credits: { enabled: false },
-        /** Don't show legend at bottom */
-        legend: { enabled: false }
+            },
+            title: { text: null },
+            xAxis: {
+                type: 'datetime',
+                title: { enabled: false }
+            },
+            yAxis: {
+                title: { enabled: false },
+                labels: { enabled: false },
+                min: 0
+            },
+            series: [
+                {
+                    name: 'Datasets',
+                    /** Stupid random start values */
+                    data: shallow_copy(small_chart_data)
+                }
+            ],
+            plotOptions: {
+                series: {
+                    marker: { enabled: false },
+                    enableMouseTracking: false
+                }
+            },
+            tooltip: { enabled: false },
+            /** Don't show credits link */
+            // credits: { enabled: false },
+            /** Don't show legend at bottom */
+            legend: { enabled: false }
+        });
     });
 });
 
