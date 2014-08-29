@@ -1,5 +1,9 @@
 const samples = 100;
 
+/** Contains the data for selected start and end points */
+var start_point;
+var end_point;
+
 /** Contains the data for the big chart */
 var big_chart_data;
 
