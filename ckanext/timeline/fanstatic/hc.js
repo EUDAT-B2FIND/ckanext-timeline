@@ -11,7 +11,7 @@ var big_chart_data;
 var small_chart_data;
 
 /** Contains the URL for the CKAN API */
-const api_url = "http://eudat6a.dkrz.de/api/3/action/timeline"
+const api_url = "http://eudat6a.dkrz.de/api/3/action/timeline";
 
 $(function () {
     $('#big-chart').highcharts({
@@ -34,7 +34,7 @@ $(function () {
                             function (data) {
                                 $('#big-chart').highcharts().series[0].setData(
                                     data.result.map(function (x) {
-                                        return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]]
+                                        return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]];
                                 }));
                         });
                     }
@@ -65,7 +65,7 @@ $(function () {
         },
         series: [
             {
-                name: 'Datasets',
+                name: 'Datasets'
                 /** Stupid random start values */
                 // data: helpers.generateRandomData(-100, samples)
             }
@@ -91,7 +91,7 @@ $(function () {
         },
         function (data) {
             small_chart_data = data.result.map(function (x) {
-                return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]]
+                return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]];
             });
 
         $('#small-chart').highcharts({
@@ -117,8 +117,8 @@ $(function () {
                                 },
                                 function (data) {
                                     big_chart_data = data.result.map(function (x) {
-                                        return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]]
-                                    })
+                                        return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]];
+                                    });
                                     $('#big-chart').highcharts().series[0].setData(shallow_copy(big_chart_data));
                             });
 
@@ -184,27 +184,27 @@ helpers.year = 12 * helpers.month;
 
 /** zb should be seconds from Year 0 in UTC, as Number or String */
 helpers.zeroBasedAsUnix = function (zb) {
-    return helpers.yearZero.unix() + Number(zb)
+    return helpers.yearZero.unix() + Number(zb);
 };
 
 /** ux should be seconds from Year 1970 (Epoch) in UTC, as Number or String */
 helpers.unixAsZeroBased = function (ux) {
-    return Number(ux) - helpers.yearZero.unix()
+    return Number(ux) - helpers.yearZero.unix();
 };
 
 /** Converts milliseconds to seconds */
 helpers.msToS = function (ms) {
-    return ms / 1000
+    return ms / 1000;
 };
 
 /** Converts seconds to milliseconds */
 helpers.sToMs = function (s) {
-    return s * 1000
+    return s * 1000;
 };
 
 /** Generates a random integer between min and max */
 helpers.getRandomInt = function (min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
 /** Generates some random data for diagram */
@@ -228,7 +228,7 @@ helpers.generateRandomData = function (stime, n) {
         ]);
     }
 
-    return data
+    return data;
 };
 
 /** Generates some random data for diagram */
@@ -246,7 +246,7 @@ helpers.generateRandomDataEnd = function (stime, etime, n) {
         ]);
     }
 
-    return data
+    return data;
 };
 
 
@@ -299,5 +299,5 @@ function convertSecondsToHuman(seconds) {
 
 /** Creates a shallow copy of an array */
 function shallow_copy(array) {
-  return array.slice(0)
+    return array.slice(0);
 }
