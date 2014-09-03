@@ -17,6 +17,7 @@ HOST = 'http://localhost:8983/solr'
 QUERY = 'extras_TempCoverageBegin:[* TO {e}] AND extras_TempCoverageEnd:[{s} TO *]'
 START_FIELD = 'extras_TempCoverageBegin'
 END_FIELD = 'extras_TempCoverageEnd'
+RANGES = 100
 
 
 class TimelineAPIPlugin(plugins.SingletonPlugin):
@@ -88,24 +89,24 @@ def timeline(context, request_data):
     delta = float(end - start)
     log.debug('delta: {d}'.format(d=delta))
 
-    interval = delta / 100
+    interval = delta / RANGES
     log.debug('interval: {i}'.format(i=interval))
 
-    # Expand range to 100
+    # Expand amount of ranges to RANGES
     if interval < 1:
         interval = 1
-        start -= (100 - int(delta)) // 2
+        start -= (RANGES - int(delta)) // 2
 
     ls = set()
-    for a in range(100):
+    for a in range(RANGES):
         s = int(start + interval * a)
         e = int(start + interval * (a + 1))
         m = (s + e) // 2
         if s != e:
             ls.add((s, e, m))
 
-    if len(ls) != 100:
-        log.warning('{l} not 100 elements'.format(l=len(ls)))
+    if len(ls) != RANGES:
+        log.warning('{l} not {r} elements'.format(l=len(ls), r=RANGES))
 
     ls = list(ls)
     # log.debug('ls: {l}'.format(l=ls))
