@@ -1,4 +1,4 @@
-from __future__ import absolute_import, with_statement, print_function, generators, nested_scopes, unicode_literals
+from __future__ import absolute_import, with_statement, print_function, generators, nested_scopes, unicode_literals, division
 
 import logging
 import threading
@@ -95,7 +95,7 @@ def timeline(context, request_data):
     for a in range(100):
         s = int(start + interval * a)
         e = int(start + interval * (a + 1))
-        m = (s + e) / 2
+        m = (s + e) // 2
         if s != e:
             ls.add((s, e, m))
 
