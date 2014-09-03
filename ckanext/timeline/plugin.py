@@ -91,6 +91,11 @@ def timeline(context, request_data):
     interval = delta / 100
     log.debug('interval: {i}'.format(i=interval))
 
+    # Expand range to 100
+    if interval < 1:
+        interval = 1
+        start -= (100 - int(delta)) // 2
+
     ls = set()
     for a in range(100):
         s = int(start + interval * a)
