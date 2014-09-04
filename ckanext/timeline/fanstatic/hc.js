@@ -301,3 +301,13 @@ function convertSecondsToHuman(seconds) {
 function shallow_copy(array) {
     return array.slice(0);
 }
+
+/** Find the closest numeric element value in an array. Returns the difference, element and index */
+function nearestNumValue(array, value) {
+    return array.map(function (n) {
+        return [Math.abs(value - n), n];
+    }).reduce(function (a, b, i) {
+        b.push(i);
+        return a[0] < b[0] ? a : b;
+    });
+}
