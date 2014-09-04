@@ -129,7 +129,15 @@ def timeline(context, request_data):
     return sorted(rl)
 
 
-def ps((s, e, m)):
+def ps(t):
+    '''
+    Makes a request to Solr and returns the result
+
+    :param t: Tuple containing "start", "end" and "mean" values
+    :type t: (int, int, int)
+    :rtype: (int, int, int, int)
+    '''
+    s, e, m = t
     solr = ckan.lib.search.make_connection()
     n = solr.select(QUERY.format(s=s, e=e),
                     fields=['id'],
