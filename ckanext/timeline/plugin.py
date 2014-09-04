@@ -86,7 +86,7 @@ def timeline(context, request_data):
     log.debug('start: {0}'.format(start))
     log.debug('end: {0}'.format(end))
 
-    delta = float(end - start)
+    delta = end - start
     log.debug('delta: {d}'.format(d=delta))
 
     interval = delta / RANGES
@@ -94,8 +94,8 @@ def timeline(context, request_data):
 
     # Expand amount of ranges to RANGES
     if interval < 1:
-        interval = 1
-        start -= (RANGES - int(delta)) // 2
+        interval = 1.0
+        start -= (RANGES - delta) // 2
 
     ls = set()
     for a in range(RANGES):
