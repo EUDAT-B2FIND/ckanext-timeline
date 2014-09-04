@@ -50,12 +50,15 @@ def timeline(context, request_data):
     end = request_data.get('end')
     method = request_data.get('method', 't')
 
+    # Validate values
     if start is None:
         raise ckan.logic.ValidationError({'start': _('Missing value')})
     if end is None:
         raise ckan.logic.ValidationError({'end': _('Missing value')})
     if method not in ('s', 'p', 't'):
         raise ckan.logic.ValidationError({'method': _('Wrong value')})
+
+    # Handle open/'*' start and end points
     if start == '*':
         try:
             c = ckan.lib.search.make_connection()
@@ -79,8 +82,11 @@ def timeline(context, request_data):
         finally:
             c.close()
 
+    # Convert to ints
     start = int(start)
     end = int(end)
+
+    # Verify 'end' larger than 'start'
     if end <= start:
         raise ckan.logic.ValidationError({'end': _('Smaller or equal to start')})
     log.debug('start: {0}'.format(start))
@@ -97,21 +103,28 @@ def timeline(context, request_data):
         interval = 1.0
         start -= (RANGES - delta) // 2
 
+    # Use a set for tuple uniqueness
     ls = set()
+
+    # Create the ranges
     for a in range(RANGES):
         s = int(start + interval * a)
         e = int(start + interval * (a + 1))
         m = (s + e) // 2
+
+        # Make sure 's' and 'e' are not equal
         if s != e:
             ls.add((s, e, m))
 
     if len(ls) != RANGES:
         log.warning('{l} not {r} elements'.format(l=len(ls), r=RANGES))
 
+    # Convert 'ls' to a list, because of JSON
     ls = list(ls)
     # log.debug('ls: {l}'.format(l=ls))
 
 
+    # Make requests
     if method == 't':
         log.debug('Method: threading')
         # TODO: Would collections.deque be faster and/or thread-safer?
@@ -126,6 +139,7 @@ def timeline(context, request_data):
         log.debug('Method: sequential')
         rl = [ps(l) for l in ls]
 
+    # Sort the list for readability
     return sorted(rl)
 
 
