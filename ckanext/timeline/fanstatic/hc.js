@@ -20,9 +20,11 @@ $(function () {
             zoomType: 'x',
             events: {
                 selection: function (event) {
+                    const chart = $('#big-chart').highcharts();
+                    const series = chart.series[0];
                     if (event.xAxis) {
-                        var min = event.xAxis[0].min;
-                        var max = event.xAxis[0].max;
+                        const min = event.xAxis[0].min;
+                        const max = event.xAxis[0].max;
                         console.log("Big chart: ", min, max);
 
                         /** Update big-chart with new values */
@@ -32,15 +34,14 @@ $(function () {
                                 end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max)))
                             },
                             function (data) {
-                                $('#big-chart').highcharts().series[0].setData(
+                                series.setData(
                                     data.result.map(function (x) {
                                         return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]];
                                 }));
                         });
                     }
                     else if (event.resetSelection) {
-                        console.log("Reset: ", event);
-                        $('#big-chart').highcharts().series[0].setData(shallow_copy(big_chart_data));
+                        series.setData(shallow_copy(big_chart_data));
                     }
                     /** Disables visual zooming */
                     // event.preventDefault();
@@ -61,7 +62,7 @@ $(function () {
             title: {
                 text: 'Datasets'
             },
-            min: 0
+            floor: 0
         },
         series: [
             {
