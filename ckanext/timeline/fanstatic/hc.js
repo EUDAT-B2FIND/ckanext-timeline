@@ -4,6 +4,15 @@ const samples = 100;
 var start_point;
 var end_point;
 
+/** Contains the x values for selected points [real, current-approximate] */
+var points = [];
+
+/** Indicates whether mouse was clicked */
+var was_mouse_click = false;
+
+/** Indicates whether we are redrawing */
+var is_redraw = false;
+
 /** Contains the data for the big chart */
 var big_chart_data;
 
@@ -41,10 +50,35 @@ $(function () {
                         });
                     }
                     else if (event.resetSelection) {
+                        /** Reset big-chart data to the selection from small-chart */
                         series.setData(shallow_copy(big_chart_data));
                     }
                     /** Disables visual zooming */
                     // event.preventDefault();
+                },
+                redraw: function (event) {
+                    const chart = $('#big-chart').highcharts();
+                    const series = chart.series[0];
+                    is_redraw = true;
+
+                    /** Clear selected points */
+                    chart.getSelectedPoints().forEach(function (p) { p.select(false, true) });
+
+                    /** Restore selected points if withing selected range
+                     * NOTE! This approximates to the nearest point, as exact point might not exist */
+                    points && points.forEach(function (v) {
+                        const ext = chart.xAxis[0].getExtremes();
+                        const real_point = v[0];
+                        if (real_point >= ext.dataMin && real_point <= ext.dataMax) {
+                            /** Find the nearest point and select it */
+                            const np = nearestNumValue(series.data.map(function (p) { return p.x }), real_point);
+                            series.data[np[2]].select(true, true);
+
+                            /** Save chosen point */
+                            v[1] = np[1];
+                        }
+                    });
+                    is_redraw = false;
                 }
             }
         },
@@ -77,6 +111,52 @@ $(function () {
                 /** Hides the line */
                 // lineWidth: 0,
                 allowPointSelect: true,
+                point: {
+                    events: {
+                        select: function (event) {
+                            var chart = $('#big-chart').highcharts();
+
+                            /** Prevent non-accumulate clicks */
+                            if (!event.accumulate) {
+                                was_mouse_click = false;
+                                return false;
+                            }
+
+                            /** Prevent selection of more than 2 points */
+                            if (points.length > 1) {
+                                if (!is_redraw) { return false }
+                            }
+
+                            /** Check that mouse was clicked */
+                            if (was_mouse_click) {
+                                points.push([this.x, this.x]);
+                                was_mouse_click = false;
+                            }
+                        },
+                        unselect: function (event) {
+                            /** Prevent non-accumulate clicks */
+                            if (!event.accumulate) {
+                                was_mouse_click = false;
+                                return false;
+                            }
+
+                            /** Check that mouse was clicked */
+                            if (was_mouse_click) {
+                                /** Remove point from points */
+                                if (points.length == 1) {
+                                    points = []
+                                }
+                                else if (points.length == 2) {
+                                    points = points.filter(function (p) { return p[1] != this.x }, this)
+                                }
+                                was_mouse_click = false;
+                            }
+                        },
+                        click: function (event) {
+                            was_mouse_click = true;
+                        }
+                    }
+                }
             }
         },
         /** Don't show credits link */
