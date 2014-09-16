@@ -7,6 +7,10 @@ var end_point;
 /** Contains the x values for selected points [real, current-approximate] */
 var points = [];
 
+/** Text boxes for search interface */
+var start_box;
+var end_box;
+
 /** Indicates whether mouse was clicked */
 var was_mouse_click = false;
 
@@ -23,6 +27,12 @@ var small_chart_data;
 const api_url = "http://eudat6a.dkrz.de/api/3/action/timeline";
 
 $(function () {
+    start_box = $('#boxes #start');
+    end_box = $('#boxes #end');
+
+    start_box.val('');
+    end_box.val('');
+
     $('#big-chart').highcharts({
         chart: {
             type: 'line',
@@ -133,6 +143,14 @@ $(function () {
                                 points.sort(function (a, b) {
                                     return a[0] > b[0];
                                 });
+                                if (points.length == 1) {
+                                    start_box.val(points[0][0]);
+                                    end_box.val('');
+                                }
+                                else if (points.length == 2) {
+                                    start_box.val(points[0][0]);
+                                    end_box.val(points[1][0]);
+                                }
                                 was_mouse_click = false;
                             }
                         },
@@ -147,10 +165,14 @@ $(function () {
                             if (was_mouse_click) {
                                 /** Remove point from points */
                                 if (points.length == 1) {
-                                    points = []
+                                    points = [];
+                                    start_box.val('');
+                                    end_box.val('');
                                 }
                                 else if (points.length == 2) {
-                                    points = points.filter(function (p) { return p[1] != this.x }, this)
+                                    points = points.filter(function (p) { return p[1] != this.x }, this);
+                                    start_box.val(points[0][0]);
+                                    end_box.val('');
                                 }
                                 was_mouse_click = false;
                             }
