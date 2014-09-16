@@ -130,6 +130,9 @@ $(function () {
                             /** Check that mouse was clicked */
                             if (was_mouse_click) {
                                 points.push([this.x, this.x]);
+                                points.sort(function (a, b) {
+                                    return a[0] > b[0];
+                                });
                                 was_mouse_click = false;
                             }
                         },
