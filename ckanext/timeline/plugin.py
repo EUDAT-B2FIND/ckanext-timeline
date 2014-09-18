@@ -1,4 +1,5 @@
-from __future__ import absolute_import, with_statement, print_function, generators, nested_scopes, unicode_literals, division
+from __future__ import absolute_import, with_statement, print_function, generators, nested_scopes, division
+# from __future__ import unicode_literals  # Cause template error
 
 import logging
 import threading
