@@ -10,6 +10,7 @@ import ckan.plugins as plugins
 import ckan.logic
 import ckan.lib.search
 import ckan.lib.search.query
+import ckan.plugins.toolkit as toolkit
 from ckan.common import _
 
 log = logging.getLogger(__name__)
@@ -23,6 +24,11 @@ RANGES = 100
 
 class TimelineAPIPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.interfaces.IActions, inherit=True)
+    plugins.implements(plugins.IConfigurer)
+
+    def update_config(self, config):
+        toolkit.add_template_directory(config, 'templates')
+        toolkit.add_resource('fanstatic', 'ckanext-timeline')
 
     def get_actions(self):
         return {'timeline': timeline}
