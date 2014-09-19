@@ -320,6 +320,13 @@ $(function () {
         $('#small-chart').highcharts().reflow();
     });
 
+    /** Execute search after hiding the modal */
+    $('#timelineModal').on('hidden', function () {
+        if (points.length == 2) {
+            form.submit();
+        }
+    });
+
     function update_search_box(jquery, unix_ms) {
         var c = '';
         if (unix_ms) {
