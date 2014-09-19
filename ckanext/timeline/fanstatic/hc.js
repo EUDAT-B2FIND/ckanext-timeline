@@ -313,6 +313,12 @@ $(function () {
             }
         );
     });
+
+    /** Reflow the graphs when showing the modal */
+    $('#timelineModal').on('shown', function () {
+        $('#big-chart').highcharts().reflow();
+        $('#small-chart').highcharts().reflow();
+    });
 });
 
 
