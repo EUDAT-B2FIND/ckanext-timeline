@@ -176,16 +176,16 @@ $(function () {
                                         return a[0] > b[0];
                                     });
                                     if (points.length == 1) {
-                                        start_box.val(points[0][0]);
-                                        start_box_hidden.val(points[0][0]);
-                                        end_box.val('');
-                                        end_box_hidden.val('');
+                                        update_search_box(start_box, points[0][0]);
+                                        update_search_box(start_box_hidden, points[0][0]);
+                                        update_search_box(end_box, '');
+                                        update_search_box(end_box_hidden, '');
                                     }
                                     else if (points.length == 2) {
-                                        start_box.val(points[0][0]);
-                                        start_box_hidden.val(points[0][0]);
-                                        end_box.val(points[1][0]);
-                                        end_box_hidden.val(points[1][0]);
+                                        update_search_box(start_box, points[0][0]);
+                                        update_search_box(start_box_hidden, points[0][0]);
+                                        update_search_box(end_box, points[1][0]);
+                                        update_search_box(end_box_hidden, points[1][0]);
                                     }
                                     was_mouse_click = false;
                                 }
@@ -202,17 +202,17 @@ $(function () {
                                     /** Remove point from points */
                                     if (points.length == 1) {
                                         points = [];
-                                        start_box.val('');
-                                        start_box_hidden.val('');
-                                        end_box.val('');
-                                        end_box_hidden.val('');
+                                        update_search_box(start_box, '');
+                                        update_search_box(start_box_hidden, '');
+                                        update_search_box(end_box, '');
+                                        update_search_box(end_box_hidden, '');
                                     }
                                     else if (points.length == 2) {
                                         points = points.filter(function (p) { return p[1] != this.x }, this);
-                                        start_box.val(points[0][0]);
-                                        start_box_hidden.val(points[0][0]);
-                                        end_box.val('');
-                                        end_box_hidden.val('');
+                                        update_search_box(start_box, points[0][0]);
+                                        update_search_box(start_box_hidden, points[0][0]);
+                                        update_search_box(end_box, '');
+                                        update_search_box(end_box_hidden, '');
                                     }
                                     was_mouse_click = false;
                                 }
@@ -319,6 +319,14 @@ $(function () {
         $('#big-chart').highcharts().reflow();
         $('#small-chart').highcharts().reflow();
     });
+
+    function update_search_box(jquery, unix_ms) {
+        var c = '';
+        if (unix_ms) {
+            c = helpers.unixAsZeroBased(helpers.msToS(Number(unix_ms)));
+        }
+        jquery.val(c);
+    }
 });
 
 
