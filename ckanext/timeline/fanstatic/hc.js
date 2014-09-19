@@ -10,6 +10,8 @@ var points = [];
 /** Text boxes for search interface */
 var start_box;
 var end_box;
+var start_box_hidden;
+var end_box_hidden;
 
 /** Indicates whether mouse was clicked */
 var was_mouse_click = false;
@@ -27,8 +29,10 @@ var small_chart_data;
 const api_url = "http://eudat6a.dkrz.de/api/3/action/timeline";
 
 $(function () {
-    start_box = $('#boxes #start');
-    end_box = $('#boxes #end');
+    start_box = $('#timeline #start');
+    end_box = $('#timeline #end');
+    start_box_hidden = $('#ext_timeline_start');
+    end_box_hidden = $('#ext_timeline_end');
 
     start_box.val('');
     end_box.val('');
@@ -147,11 +151,15 @@ $(function () {
                                     });
                                     if (points.length == 1) {
                                         start_box.val(points[0][0]);
+                                        start_box_hidden.val(points[0][0]);
                                         end_box.val('');
+                                        end_box_hidden.val('');
                                     }
                                     else if (points.length == 2) {
                                         start_box.val(points[0][0]);
+                                        start_box_hidden.val(points[0][0]);
                                         end_box.val(points[1][0]);
+                                        end_box_hidden.val(points[1][0]);
                                     }
                                     was_mouse_click = false;
                                 }
@@ -169,12 +177,16 @@ $(function () {
                                     if (points.length == 1) {
                                         points = [];
                                         start_box.val('');
+                                        start_box_hidden.val('');
                                         end_box.val('');
+                                        end_box_hidden.val('');
                                     }
                                     else if (points.length == 2) {
                                         points = points.filter(function (p) { return p[1] != this.x }, this);
                                         start_box.val(points[0][0]);
+                                        start_box_hidden.val(points[0][0]);
                                         end_box.val('');
+                                        end_box_hidden.val('');
                                     }
                                     was_mouse_click = false;
                                 }
