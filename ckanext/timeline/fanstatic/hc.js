@@ -33,187 +33,20 @@ $(function () {
     start_box.val('');
     end_box.val('');
 
-    $('#big-chart').highcharts({
-        chart: {
-            type: 'line',
-            zoomType: 'x',
-            events: {
-                selection: function (event) {
-                    const chart = $('#big-chart').highcharts();
-                    const series = chart.series[0];
-                    if (event.xAxis) {
-                        const min = event.xAxis[0].min;
-                        const max = event.xAxis[0].max;
-                        console.log("Big chart: ", min, max);
-
-                        /** Update big-chart with new values */
-                        $.getJSON(api_url,
-                            {
-                                start: parseInt(helpers.unixAsZeroBased(helpers.msToS(min))),
-                                end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max)))
-                            },
-                            function (data) {
-                                series.setData(
-                                    data.result.map(function (x) {
-                                        return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]];
-                                }));
-                        });
-                    }
-                    else if (event.resetSelection) {
-                        /** Reset big-chart data to the selection from small-chart */
-                        series.setData(shallow_copy(big_chart_data));
-                    }
-                    /** Disables visual zooming */
-                    // event.preventDefault();
-                },
-                redraw: function (event) {
-                    const chart = $('#big-chart').highcharts();
-                    const series = chart.series[0];
-                    is_redraw = true;
-
-                    /** Clear selected points */
-                    chart.getSelectedPoints().forEach(function (p) { p.select(false, true) });
-
-                    /** Restore selected points if withing selected range
-                     * NOTE! This approximates to the nearest point, as exact point might not exist */
-                    points && points.forEach(function (v) {
-                        const ext = chart.xAxis[0].getExtremes();
-                        const real_point = v[0];
-                        if (real_point >= ext.dataMin && real_point <= ext.dataMax) {
-                            /** Find the nearest point and select it */
-                            const np = nearestNumValue(series.data.map(function (p) { return p.x }), real_point);
-                            series.data[np[2]].select(true, true);
-
-                            /** Save chosen point */
-                            v[1] = np[1];
-                        }
-                    });
-                    is_redraw = false;
-                }
-            }
-        },
-        title: {
-            text: 'Datasets relative to time'
-        },
-        xAxis: {
-            type: 'datetime',
-            minRange: samples * 1000,
-            title: {
-                text: 'Time'
-            }
-        },
-        yAxis: {
-            title: {
-                text: 'Datasets'
-            },
-            floor: 0
-        },
-        series: [
-            {
-                name: 'Datasets'
-                /** Stupid random start values */
-                // data: helpers.generateRandomData(-100, samples)
-            }
-        ],
-        plotOptions: {
-            series: {
-                // marker: { enabled: false },
-                /** Hides the line */
-                // lineWidth: 0,
-                allowPointSelect: true,
-                point: {
-                    events: {
-                        select: function (event) {
-                            var chart = $('#big-chart').highcharts();
-
-                            /** Prevent non-accumulate clicks */
-                            if (!event.accumulate) {
-                                was_mouse_click = false;
-                                return false;
-                            }
-
-                            /** Prevent selection of more than 2 points */
-                            if (points.length > 1) {
-                                if (!is_redraw) { return false }
-                            }
-
-                            /** Check that mouse was clicked */
-                            if (was_mouse_click) {
-                                points.push([this.x, this.x]);
-                                points.sort(function (a, b) {
-                                    return a[0] > b[0];
-                                });
-                                if (points.length == 1) {
-                                    start_box.val(points[0][0]);
-                                    end_box.val('');
-                                }
-                                else if (points.length == 2) {
-                                    start_box.val(points[0][0]);
-                                    end_box.val(points[1][0]);
-                                }
-                                was_mouse_click = false;
-                            }
-                        },
-                        unselect: function (event) {
-                            /** Prevent non-accumulate clicks */
-                            if (!event.accumulate) {
-                                was_mouse_click = false;
-                                return false;
-                            }
-
-                            /** Check that mouse was clicked */
-                            if (was_mouse_click) {
-                                /** Remove point from points */
-                                if (points.length == 1) {
-                                    points = [];
-                                    start_box.val('');
-                                    end_box.val('');
-                                }
-                                else if (points.length == 2) {
-                                    points = points.filter(function (p) { return p[1] != this.x }, this);
-                                    start_box.val(points[0][0]);
-                                    end_box.val('');
-                                }
-                                was_mouse_click = false;
-                            }
-                        },
-                        click: function (event) {
-                            was_mouse_click = true;
-                        }
-                    }
-                }
-            }
-        },
-        /** Don't show credits link */
-        credits: { enabled: false },
-        /** Don't show legend at bottom */
-        legend: { enabled: false }
-    });
-
-    $.getJSON(api_url,
-        {
-            start: '*',
-            end: '*'
-        },
-        function (data) {
-            small_chart_data = data.result.map(function (x) {
-                return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]];
-            });
-
-        $('#small-chart').highcharts({
+    /** Create the graphs before showing the modal */
+    $('#timelineModal').on('show', function () {
+        $('#big-chart').highcharts({
             chart: {
                 type: 'line',
-                // type: 'area',
-                // type: 'column',
-                // type: 'spline',
                 zoomType: 'x',
-                spacingLeft: 60,
                 events: {
                     selection: function (event) {
+                        const chart = $('#big-chart').highcharts();
+                        const series = chart.series[0];
                         if (event.xAxis) {
-                            var min = event.xAxis[0].min;
-                            var max = event.xAxis[0].max;
-                            console.log("Small chart: ", min, max);
+                            const min = event.xAxis[0].min;
+                            const max = event.xAxis[0].max;
+                            console.log("Big chart: ", min, max);
 
                             /** Update big-chart with new values */
                             $.getJSON(api_url,
@@ -222,54 +55,225 @@ $(function () {
                                     end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max)))
                                 },
                                 function (data) {
-                                    big_chart_data = data.result.map(function (x) {
-                                        return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]];
-                                    });
-                                    $('#big-chart').highcharts().series[0].setData(shallow_copy(big_chart_data));
-                            });
-
-                            /** Apply mask on y-axis */
-                            this.xAxis[0].removePlotBand('mask');
-                            this.xAxis[0].addPlotBand({
-                                id: 'mask',
-                                from: min,
-                                to: max,
-                                color: 'rgba(0, 0, 0, 0.2)'
+                                    series.setData(
+                                        data.result.map(function (x) {
+                                            return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]];
+                                    }));
                             });
                         }
-                        event.preventDefault()
+                        else if (event.resetSelection) {
+                            /** Reset big-chart data to the selection from small-chart */
+                            series.setData(shallow_copy(big_chart_data));
+                        }
+                        /** Disables visual zooming */
+                        // event.preventDefault();
+                    },
+                    redraw: function (event) {
+                        const chart = $('#big-chart').highcharts();
+                        const series = chart.series[0];
+                        is_redraw = true;
+
+                        /** Clear selected points */
+                        chart.getSelectedPoints().forEach(function (p) { p.select(false, true) });
+
+                        /** Restore selected points if withing selected range
+                         * NOTE! This approximates to the nearest point, as exact point might not exist */
+                        points && points.forEach(function (v) {
+                            const ext = chart.xAxis[0].getExtremes();
+                            const real_point = v[0];
+                            if (real_point >= ext.dataMin && real_point <= ext.dataMax) {
+                                /** Find the nearest point and select it */
+                                const np = nearestNumValue(series.data.map(function (p) { return p.x }), real_point);
+                                series.data[np[2]].select(true, true);
+
+                                /** Save chosen point */
+                                v[1] = np[1];
+                            }
+                        });
+                        is_redraw = false;
                     }
                 }
             },
-            title: { text: null },
+            title: {
+                text: 'Datasets relative to time'
+            },
             xAxis: {
                 type: 'datetime',
-                title: { enabled: false }
+                minRange: samples * 1000,
+                title: {
+                    text: 'Time'
+                }
             },
             yAxis: {
-                title: { enabled: false },
-                labels: { enabled: false },
-                min: 0
+                title: {
+                    text: 'Datasets'
+                },
+                floor: 0
             },
             series: [
                 {
-                    name: 'Datasets',
+                    name: 'Datasets'
                     /** Stupid random start values */
-                    data: shallow_copy(small_chart_data)
+                    // data: helpers.generateRandomData(-100, samples)
                 }
             ],
             plotOptions: {
                 series: {
-                    marker: { enabled: false },
-                    enableMouseTracking: false
+                    // marker: { enabled: false },
+                    /** Hides the line */
+                    // lineWidth: 0,
+                    allowPointSelect: true,
+                    point: {
+                        events: {
+                            select: function (event) {
+                                var chart = $('#big-chart').highcharts();
+
+                                /** Prevent non-accumulate clicks */
+                                if (!event.accumulate) {
+                                    was_mouse_click = false;
+                                    return false;
+                                }
+
+                                /** Prevent selection of more than 2 points */
+                                if (points.length > 1) {
+                                    if (!is_redraw) { return false }
+                                }
+
+                                /** Check that mouse was clicked */
+                                if (was_mouse_click) {
+                                    points.push([this.x, this.x]);
+                                    points.sort(function (a, b) {
+                                        return a[0] > b[0];
+                                    });
+                                    if (points.length == 1) {
+                                        start_box.val(points[0][0]);
+                                        end_box.val('');
+                                    }
+                                    else if (points.length == 2) {
+                                        start_box.val(points[0][0]);
+                                        end_box.val(points[1][0]);
+                                    }
+                                    was_mouse_click = false;
+                                }
+                            },
+                            unselect: function (event) {
+                                /** Prevent non-accumulate clicks */
+                                if (!event.accumulate) {
+                                    was_mouse_click = false;
+                                    return false;
+                                }
+
+                                /** Check that mouse was clicked */
+                                if (was_mouse_click) {
+                                    /** Remove point from points */
+                                    if (points.length == 1) {
+                                        points = [];
+                                        start_box.val('');
+                                        end_box.val('');
+                                    }
+                                    else if (points.length == 2) {
+                                        points = points.filter(function (p) { return p[1] != this.x }, this);
+                                        start_box.val(points[0][0]);
+                                        end_box.val('');
+                                    }
+                                    was_mouse_click = false;
+                                }
+                            },
+                            click: function (event) {
+                                was_mouse_click = true;
+                            }
+                        }
+                    }
                 }
             },
-            tooltip: { enabled: false },
             /** Don't show credits link */
-            // credits: { enabled: false },
+            credits: { enabled: false },
             /** Don't show legend at bottom */
             legend: { enabled: false }
         });
+
+        $.getJSON(api_url,
+            {
+                start: '*',
+                end: '*'
+            },
+            function (data) {
+                small_chart_data = data.result.map(function (x) {
+                    return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]];
+                });
+
+                $('#small-chart').highcharts({
+                    chart: {
+                        type: 'line',
+                        // type: 'area',
+                        // type: 'column',
+                        // type: 'spline',
+                        zoomType: 'x',
+                        spacingLeft: 60,
+                        events: {
+                            selection: function (event) {
+                                if (event.xAxis) {
+                                    var min = event.xAxis[0].min;
+                                    var max = event.xAxis[0].max;
+                                    console.log("Small chart: ", min, max);
+
+                                    /** Update big-chart with new values */
+                                    $.getJSON(api_url,
+                                        {
+                                            start: parseInt(helpers.unixAsZeroBased(helpers.msToS(min))),
+                                            end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max)))
+                                        },
+                                        function (data) {
+                                            big_chart_data = data.result.map(function (x) {
+                                                return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]];
+                                            });
+                                            $('#big-chart').highcharts().series[0].setData(shallow_copy(big_chart_data));
+                                    });
+
+                                    /** Apply mask on y-axis */
+                                    this.xAxis[0].removePlotBand('mask');
+                                    this.xAxis[0].addPlotBand({
+                                        id: 'mask',
+                                        from: min,
+                                        to: max,
+                                        color: 'rgba(0, 0, 0, 0.2)'
+                                    });
+                                }
+                                event.preventDefault()
+                            }
+                        }
+                    },
+                    title: { text: null },
+                    xAxis: {
+                        type: 'datetime',
+                        title: { enabled: false }
+                    },
+                    yAxis: {
+                        title: { enabled: false },
+                        labels: { enabled: false },
+                        min: 0
+                    },
+                    series: [
+                        {
+                            name: 'Datasets',
+                            /** Stupid random start values */
+                            data: shallow_copy(small_chart_data)
+                        }
+                    ],
+                    plotOptions: {
+                        series: {
+                            marker: { enabled: false },
+                            enableMouseTracking: false
+                        }
+                    },
+                    tooltip: { enabled: false },
+                    /** Don't show credits link */
+                    // credits: { enabled: false },
+                    /** Don't show legend at bottom */
+                    legend: { enabled: false }
+                });
+            }
+        );
     });
 });
 
