@@ -25,10 +25,43 @@ RANGES = 100
 class TimelineAPIPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.interfaces.IActions, inherit=True)
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.IPackageController, inherit=True)
 
     def update_config(self, config):
         toolkit.add_template_directory(config, 'templates')
         toolkit.add_resource('fanstatic', 'ckanext-timeline')
+
+    def before_search(self, search_params):
+        extras = search_params.get('extras')
+        log.debug("extras: {0}".format(extras))
+        if not extras:
+            # There are no extras in the search params, so do nothing.
+            return search_params
+
+        start_point = extras.get('ext_timeline_start')
+        log.debug("start_point: {0}".format(start_point))
+
+        end_point = extras.get('ext_timeline_end')
+        log.debug("end_point: {0}".format(end_point))
+
+        if not start_point and not end_point:
+            # The user didn't select either a start and/or end date, so do nothing.
+            return search_params
+        if not start_point:
+            start_point = '*'
+        if not end_point:
+            end_point = '*'
+
+        # Add a time-range query with the selected start and/or end points into the Solr facet queries.
+        fq = search_params['fq']
+        log.debug("fq: {0}".format(fq))
+        fq = '{fq} +{q}'.format(fq=fq, q=QUERY).format(s=start_point, e=end_point)
+
+        log.debug("fq: {0}".format(fq))
+        search_params['fq'] = fq
+        log.debug("search_params: {0}".format(search_params))
+
+        return search_params
 
     def get_actions(self):
         return {'timeline': timeline}
