@@ -43,8 +43,25 @@ $(function () {
     start_box_hidden = $('#ext_timeline_start');
     end_box_hidden = $('#ext_timeline_end');
 
-    start_box.val('');
-    end_box.val('');
+    /** Define a new jQuery function to parse parameters from URL */
+    $.urlParam = function(name) {
+        var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
+        if (results == null) { return null; } else { return decodeURIComponent(results[1]) || 0; }
+    };
+
+    /** Pick out relevant parameters */
+    const param_start = $.urlParam('ext_timeline_start');
+    const param_end = $.urlParam('ext_timeline_end');
+
+    /** Populate the timeline boxes and hidden fields */
+    if (param_start) {
+        start_box.val(param_start);
+        start_box_hidden.val(param_start);
+    }
+    if (param_end) {
+        end_box.val(param_end);
+        end_box_hidden.val(param_end);
+    }
 
     /** Create the graphs before showing the modal */
     $('#timelineModal').on('show', function () {
