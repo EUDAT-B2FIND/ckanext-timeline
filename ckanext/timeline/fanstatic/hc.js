@@ -29,6 +29,15 @@ var small_chart_data;
 const api_url = "http://eudat6a.dkrz.de/api/3/action/timeline";
 
 $(function () {
+    /** Add hidden <input> tags #ext_timeline_start and #ext_timeline_end to search form */
+    var form = $('#dataset-search');
+    /** CKAN 2.1 */
+    if (!form.length) {
+        form = $('.search-form');
+    }
+    $('<input type="hidden" id="ext_timeline_start" name="ext_timeline_start" />').appendTo(form);
+    $('<input type="hidden" id="ext_timeline_end" name="ext_timeline_end" />').appendTo(form);
+
     start_box = $('#timeline #start');
     end_box = $('#timeline #end');
     start_box_hidden = $('#ext_timeline_start');
