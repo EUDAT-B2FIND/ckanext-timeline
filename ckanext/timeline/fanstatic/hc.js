@@ -327,6 +327,43 @@ $(function () {
         }
     });
 
+    /** Set onchange triggers for search boxes */
+    start_box.change(start_box_hidden, copy_search_box);
+    end_box.change(end_box_hidden, copy_search_box);
+
+    /** Copy value from one search box to another, and update graph points */
+    function copy_search_box(e) {
+        // TODO! 'start' and 'end' values should be validated so 'start' != 'end'. New value should be set +/- 1 if equal.
+        // TODO! Points should be updated first and search boxes updated after that. So that the order is correct 'start' < 'end'.
+        var v = '';
+        const t = $(this);
+        const jquery = e.data;
+
+        /** Check that 'this' element has a value */
+        if (t.val()) {
+            v = t.val();
+            const new_p = helpers.sToMs(helpers.zeroBasedAsUnix(Number(v)));
+        }
+        /** Check that jquery object's value isn't same, before setting */
+        if (jquery.val() != v) {
+            if (jquery.val()) {
+                const old_p = helpers.sToMs(helpers.zeroBasedAsUnix(Number(jquery.val())));
+            }
+            jquery.val(v);
+        }
+
+        /** Update points for graph */
+        if (old_p) {
+            points = points.filter(function (x) { return x[0] != old_p; });
+        }
+        if (new_p) {
+            points.push([new_p, new_p]);
+        }
+        points.sort(function (a, b) {
+            return a[0] > b[0];
+        });
+    }
+
     function update_search_box(jquery, unix_ms) {
         var c = '';
         if (unix_ms) {
