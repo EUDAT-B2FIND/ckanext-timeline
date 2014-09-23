@@ -53,14 +53,16 @@ $(function () {
     const param_start = $.urlParam('ext_timeline_start');
     const param_end = $.urlParam('ext_timeline_end');
 
-    /** Populate the timeline boxes and hidden fields */
+    /** Populate the timeline boxes, hidden fields and graph points */
     if (param_start) {
         start_box.val(param_start);
         start_box_hidden.val(param_start);
+        points.push(function (x) { return [x, x] }(helpers.sToMs(helpers.zeroBasedAsUnix(param_start))));
     }
     if (param_end) {
         end_box.val(param_end);
         end_box_hidden.val(param_end);
+        points.push(function (x) { return [x, x] }(helpers.sToMs(helpers.zeroBasedAsUnix(param_end))));
     }
 
     /** Create the graphs before showing the modal */
