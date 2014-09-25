@@ -1,5 +1,5 @@
 from __future__ import absolute_import, with_statement, print_function, generators, nested_scopes, division
-# from __future__ import unicode_literals  # Cause template error
+# from __future__ import unicode_literals  # Causes template error
 
 import logging
 import threading
@@ -101,26 +101,26 @@ def timeline(context, request_data):
     # Handle open/'*' start and end points
     if start == '*':
         try:
-            c = ckan.lib.search.make_connection()
-            start = c.select('*:*',
-                             fields=['id', '{f}'.format(f=START_FIELD)],
-                             sort=['{f} asc'.format(f=START_FIELD)],
-                             rows=1).results[0][START_FIELD]
+            con = ckan.lib.search.make_connection()
+            start = con.select('*:*',
+                               fields=['id', '{f}'.format(f=START_FIELD)],
+                               sort=['{f} asc'.format(f=START_FIELD)],
+                               rows=1).results[0][START_FIELD]
         except:
             raise ckan.logic.ValidationError({'start': _('Could not find start value from Solr')})
         finally:
-            c.close()
+            con.close()
     if end == '*':
         try:
-            c = ckan.lib.search.make_connection()
-            end = c.select('*:*',
-                           fields=['id', '{f}'.format(f=END_FIELD)],
-                           sort=['{f} desc'.format(f=END_FIELD)],
-                           rows=1).results[0][END_FIELD]
+            con = ckan.lib.search.make_connection()
+            end = con.select('*:*',
+                             fields=['id', '{f}'.format(f=END_FIELD)],
+                             sort=['{f} desc'.format(f=END_FIELD)],
+                             rows=1).results[0][END_FIELD]
         except:
             raise ckan.logic.ValidationError({'end': _('Could not find end value from Solr')})
         finally:
-            c.close()
+            con.close()
 
     # Convert to ints
     start = int(start)
