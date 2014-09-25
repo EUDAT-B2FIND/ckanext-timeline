@@ -11,7 +11,7 @@ import ckan.logic
 import ckan.lib.search
 import ckan.lib.search.query
 import ckan.plugins.toolkit as toolkit
-from ckan.common import _
+from ckan.common import _, c
 
 log = logging.getLogger(__name__)
 
@@ -62,6 +62,16 @@ class TimelineAPIPlugin(plugins.SingletonPlugin):
         log.debug("search_params: {0}".format(search_params))
 
         return search_params
+
+    def after_search(self, search_results, search_params):
+        '''
+        Exports Solr 'q' and 'fq' to the context so the timeline can use them
+        '''
+
+        c.timeline_q = search_params.get('q', '')
+        c.timeline_fq = search_params.get('fq', '')
+
+        return search_results
 
     def get_actions(self):
         return {'timeline': timeline}
