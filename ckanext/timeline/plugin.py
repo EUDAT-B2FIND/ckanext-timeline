@@ -33,16 +33,12 @@ class TimelineAPIPlugin(plugins.SingletonPlugin):
 
     def before_search(self, search_params):
         extras = search_params.get('extras')
-        log.debug("extras: {0}".format(extras))
         if not extras:
             # There are no extras in the search params, so do nothing.
             return search_params
 
         start_point = extras.get('ext_timeline_start')
-        log.debug("start_point: {0}".format(start_point))
-
         end_point = extras.get('ext_timeline_end')
-        log.debug("end_point: {0}".format(end_point))
 
         if not start_point and not end_point:
             # The user didn't select either a start and/or end date, so do nothing.
@@ -54,12 +50,9 @@ class TimelineAPIPlugin(plugins.SingletonPlugin):
 
         # Add a time-range query with the selected start and/or end points into the Solr facet queries.
         fq = search_params['fq']
-        log.debug("fq: {0}".format(fq))
         fq = '{fq} +{q}'.format(fq=fq, q=QUERY).format(s=start_point, e=end_point)
 
-        log.debug("fq: {0}".format(fq))
         search_params['fq'] = fq
-        log.debug("search_params: {0}".format(search_params))
 
         return search_params
 
@@ -90,9 +83,6 @@ def timeline(context, request_data):
 
     :rtype: list
     '''
-
-    log.debug('context: {c}'.format(c=context))
-    log.debug('request_data: {r}'.format(r=request_data))
 
     #ckan.logic.check_access('timeline', context, request_data)
 
@@ -139,14 +129,10 @@ def timeline(context, request_data):
     # Verify 'end' larger than 'start'
     if end <= start:
         raise ckan.logic.ValidationError({'end': _('Smaller or equal to start')})
-    log.debug('start: {0}'.format(start))
-    log.debug('end: {0}'.format(end))
 
     delta = end - start
-    log.debug('delta: {d}'.format(d=delta))
 
     interval = delta / RANGES
-    log.debug('interval: {i}'.format(i=interval))
 
     # Expand amount of ranges to RANGES
     if interval < 1:
@@ -173,20 +159,16 @@ def timeline(context, request_data):
     ls = list(ls)
     # log.debug('ls: {l}'.format(l=ls))
 
-
     # Make requests
     if method == 't':
-        log.debug('Method: threading')
         # TODO: Would collections.deque be faster and/or thread-safer?
         rl = []
         t = [threading.Thread(target=lambda st, en, md: rl.append(ps((st, en, md))), args=l) for l in ls]
         [x.start() for x in t]
         [x.join() for x in t]
     elif method == 'p':
-        log.debug('Method: multiprocessing')
         rl = multiprocessing.Pool(multiprocessing.cpu_count()).map(ps, ls)
     elif method == 's':
-        log.debug('Method: sequential')
         rl = [ps(l) for l in ls]
 
     # Sort the list for readability
