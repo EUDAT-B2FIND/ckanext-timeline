@@ -102,10 +102,10 @@ def timeline(context, request_data):
     if start == '*':
         try:
             con = ckan.lib.search.make_connection()
-            start = con.select('*:*',
-                               fields=['id', '{f}'.format(f=START_FIELD)],
-                               sort=['{f} asc'.format(f=START_FIELD)],
-                               rows=1).results[0][START_FIELD]
+            start = con.query('*:*',
+                              fields=['id', '{f}'.format(f=START_FIELD)],
+                              sort=['{f} asc'.format(f=START_FIELD)],
+                              rows=1).results[0][START_FIELD]
         except:
             raise ckan.logic.ValidationError({'start': _('Could not find start value from Solr')})
         finally:
@@ -113,10 +113,10 @@ def timeline(context, request_data):
     if end == '*':
         try:
             con = ckan.lib.search.make_connection()
-            end = con.select('*:*',
-                             fields=['id', '{f}'.format(f=END_FIELD)],
-                             sort=['{f} desc'.format(f=END_FIELD)],
-                             rows=1).results[0][END_FIELD]
+            end = con.query('*:*',
+                            fields=['id', '{f}'.format(f=END_FIELD)],
+                            sort=['{f} desc'.format(f=END_FIELD)],
+                            rows=1).results[0][END_FIELD]
         except:
             raise ckan.logic.ValidationError({'end': _('Could not find end value from Solr')})
         finally:
@@ -185,8 +185,8 @@ def ps(t):
     '''
     s, e, m = t
     solr = ckan.lib.search.make_connection()
-    n = solr.select(QUERY.format(s=s, e=e),
-                    fields=['id'],
-                    rows=0)
+    n = solr.query(QUERY.format(s=s, e=e),
+                   fields=['id'],
+                   rows=0)
     solr.close()
     return s, e, m, n._numFound
