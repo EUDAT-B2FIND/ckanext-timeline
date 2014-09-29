@@ -4,25 +4,26 @@ from __future__ import absolute_import, with_statement, print_function, generato
 import logging
 import threading
 import multiprocessing
-from urllib2 import urlopen
 
 import ckan.plugins as plugins
 import ckan.logic
 import ckan.lib.search
-import ckan.lib.search.query
 import ckan.plugins.toolkit as toolkit
 from ckan.common import _, c
 
 log = logging.getLogger(__name__)
 
-HOST = 'http://localhost:8983/solr'
-QUERY = 'extras_TempCoverageBegin:[* TO {e}] AND extras_TempCoverageEnd:[{s} TO *]'
 START_FIELD = 'extras_TempCoverageBegin'
 END_FIELD = 'extras_TempCoverageEnd'
+QUERY = '{sf}:[* TO {e}] AND {ef}:[{s} TO *]'
 RANGES = 100
 
 
 class TimelineAPIPlugin(plugins.SingletonPlugin):
+    '''
+    Timeline plugin class that extends CKAN's functionality
+    '''
+
     plugins.implements(plugins.interfaces.IActions, inherit=True)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IPackageController, inherit=True)
@@ -50,8 +51,7 @@ class TimelineAPIPlugin(plugins.SingletonPlugin):
 
         # Add a time-range query with the selected start and/or end points into the Solr facet queries.
         fq = search_params['fq']
-        fq = '{fq} +{q}'.format(fq=fq, q=QUERY).format(s=start_point, e=end_point)
-
+        fq = '{fq} +{q}'.format(fq=fq, q=QUERY).format(s=start_point, e=end_point, sf=START_FIELD, ef=END_FIELD)
         search_params['fq'] = fq
 
         return search_params
@@ -62,7 +62,7 @@ class TimelineAPIPlugin(plugins.SingletonPlugin):
         '''
 
         c.timeline_q = search_params.get('q', '')
-        c.timeline_fq = search_params.get('fq', '')
+        c.timeline_fq = ' '.join(search_params.get('fq', []))
 
         return search_results
 
@@ -89,6 +89,8 @@ def timeline(context, request_data):
     start = request_data.get('start')
     end = request_data.get('end')
     method = request_data.get('method', 't')
+    q = request_data.get('q', '*:*')
+    fq = request_data.get('fq', '')
 
     # Validate values
     if start is None:
@@ -102,7 +104,8 @@ def timeline(context, request_data):
     if start == '*':
         try:
             con = ckan.lib.search.make_connection()
-            start = con.query('*:*',
+            start = con.query(q,
+                              fq=fq,
                               fields=['id', '{f}'.format(f=START_FIELD)],
                               sort=['{f} asc'.format(f=START_FIELD)],
                               rows=1).results[0][START_FIELD]
@@ -113,7 +116,8 @@ def timeline(context, request_data):
     if end == '*':
         try:
             con = ckan.lib.search.make_connection()
-            end = con.query('*:*',
+            end = con.query(q,
+                            fq=fq,
                             fields=['id', '{f}'.format(f=END_FIELD)],
                             sort=['{f} desc'.format(f=END_FIELD)],
                             rows=1).results[0][END_FIELD]
@@ -163,13 +167,13 @@ def timeline(context, request_data):
     if method == 't':
         # TODO: Would collections.deque be faster and/or thread-safer?
         rl = []
-        t = [threading.Thread(target=lambda st, en, md: rl.append(ps((st, en, md))), args=l) for l in ls]
+        t = [threading.Thread(target=lambda st, en, md: rl.append(ps((st, en, md, q, fq))), args=l) for l in ls]
         [x.start() for x in t]
         [x.join() for x in t]
     elif method == 'p':
-        rl = multiprocessing.Pool(multiprocessing.cpu_count()).map(ps, ls)
+        rl = multiprocessing.Pool(multiprocessing.cpu_count()).map(ps, [tcons(a, (q, fq)) for a in ls])
     elif method == 's':
-        rl = [ps(l) for l in ls]
+        rl = [ps(tcons(l, (q, fq))) for l in ls]
 
     # Sort the list for readability
     return sorted(rl)
@@ -179,16 +183,25 @@ def ps(t):
     '''
     Makes a request to Solr and returns the result
 
-    :param t: Tuple containing "start", "end" and "mean" values
-    :type t: (int, int, int)
+    :param t: Tuple containing "start", "end", "mean", "q" and "fq" values
+    :type t: (int, int, int, str, str)
     :rtype: (int, int, int, int)
     '''
-    s, e, m = t
+    s, e, m, q, fq = t
     solr = ckan.lib.search.make_connection()
-    n = solr.query(QUERY.format(s=s, e=e),
+    n = solr.query(q,
+                   fq='{0} +{1}'.format(fq, QUERY.format(s=s, e=e, sf=START_FIELD, ef=END_FIELD)),
                    fields=['id'],
                    rows=0)
     solr.close()
     found = int(n._numFound)
 
     return s, e, m, found
+
+
+def tcons(*args):
+    '''
+    Tuple cons. Chains together iterables and returns as tuple
+    '''
+    from itertools import chain
+    return tuple(chain(*args))
