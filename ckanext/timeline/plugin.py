@@ -189,4 +189,6 @@ def ps(t):
                    fields=['id'],
                    rows=0)
     solr.close()
-    return s, e, m, n._numFound
+    found = int(n._numFound)
+
+    return s, e, m, found
