@@ -19,6 +19,13 @@
           <br/>
           <span class="add-on">{{ _('End') }}:</span>
           <input type="number" class="span2" id="end" title="Human readable here!" data-toggle="tooltip"/>
+          <div>
+              <span class="add-on">{{ _('q') }}:</span>
+              <input type="text" class="span2" id="timeline-q" value="{{ c.timeline_q }}"/>
+              <br/>
+              <span class="add-on">{{ _('fq') }}:</span>
+              <input type="text" class="span2" id="timeline-fq" value="{{ c.timeline_fq }}"/>
+          </div>
       </div>
     </div>
     <div id="timelineModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:80%; margin-left:-40%">
