@@ -42,6 +42,8 @@ $(function () {
     end_box = $('#timeline #end');
     start_box_hidden = $('#ext_timeline_start');
     end_box_hidden = $('#ext_timeline_end');
+    const q_box = $('#timeline #timeline-q');
+    const fq_box = $('#timeline #timeline-fq');
 
     /** Define a new jQuery function to parse parameters from URL */
     $.urlParam = function(name) {
@@ -84,7 +86,9 @@ $(function () {
                             $.getJSON(api_url,
                                 {
                                     start: parseInt(helpers.unixAsZeroBased(helpers.msToS(min))),
-                                    end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max)))
+                                    end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max))),
+                                    q: q_box.val(),
+                                    fq: fq_box.val()
                                 },
                                 function (data) {
                                     series.setData(
@@ -235,7 +239,9 @@ $(function () {
         $.getJSON(api_url,
             {
                 start: '*',
-                end: '*'
+                end: '*',
+                q: q_box.val(),
+                fq: fq_box.val()
             },
             function (data) {
                 small_chart_data = data.result.map(function (x) {
@@ -261,7 +267,9 @@ $(function () {
                                     $.getJSON(api_url,
                                         {
                                             start: parseInt(helpers.unixAsZeroBased(helpers.msToS(min))),
-                                            end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max)))
+                                            end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max))),
+                                            q: q_box.val(),
+                                            fq: fq_box.val()
                                         },
                                         function (data) {
                                             big_chart_data = data.result.map(function (x) {
