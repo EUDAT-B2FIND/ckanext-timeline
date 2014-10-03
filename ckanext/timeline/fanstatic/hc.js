@@ -86,7 +86,6 @@ $(function () {
                         if (event.xAxis) {
                             const min = event.xAxis[0].min;
                             const max = event.xAxis[0].max;
-                            console.log("Big chart: ", min, max);
 
                             /** Update big-chart with new values */
                             $.getJSON(api_url,
@@ -267,7 +266,6 @@ $(function () {
                                 if (event.xAxis) {
                                     var min = event.xAxis[0].min;
                                     var max = event.xAxis[0].max;
-                                    console.log("Small chart: ", min, max);
 
                                     /** Update big-chart with new values */
                                     $.getJSON(api_url,
@@ -457,9 +455,7 @@ helpers.generateRandomData = function (stime, n) {
 helpers.generateRandomDataEnd = function (stime, etime, n) {
     var data = [];
 
-    console.log(stime, etime, n);
     const step = (etime - stime) / n;
-    console.log("step = ", step);
 
     for (var i = 0, start = stime; i < n; i++) {
         data.push([

@@ -177,7 +177,6 @@ def timeline(context, request_data):
 
     # Convert 'ls' to a list, because of JSON
     ls = list(ls)
-    # log.debug('ls: {l}'.format(l=ls))
 
     # Make requests
     if method == 't':
