@@ -15,7 +15,7 @@ setup(
     author='Mikael Karlsson',
     author_email='i8myshoes@gmail.com',
     url='',
-    license='GPLv3',
+    license='AGPLv3',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
     namespace_packages=['ckanext', 'ckanext.timeline'],
     include_package_data=True,

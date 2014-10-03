@@ -1,3 +1,9 @@
+/**
+ * @author Mikael Karlsson <i8myshoes@gmail.com>
+ * @copyright 2014  CSC - IT Center for Science Ltd, Finland
+ * @license GNU Affero General Public License version 3 (AGPLv3)
+ */
+
 const samples = 100;
 
 /** Contains the data for selected start and end points */

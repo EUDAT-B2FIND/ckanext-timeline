@@ -1,3 +1,9 @@
+'''
+:author: Mikael Karlsson <i8myshoes@gmail.com>
+:copyright: 2014  CSC - IT Center for Science Ltd, Finland
+:license: GNU Affero General Public License version 3 (AGPLv3)
+'''
+
 from __future__ import absolute_import, with_statement, print_function, generators, nested_scopes, division
 # from __future__ import unicode_literals  # Causes template error
 
