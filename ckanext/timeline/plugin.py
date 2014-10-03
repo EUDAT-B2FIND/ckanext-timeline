@@ -35,10 +35,16 @@ class TimelinePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IPackageController, inherit=True)
 
     def update_config(self, config):
+        '''
+        Adds template and static directories to config
+        '''
         toolkit.add_template_directory(config, 'templates')
         toolkit.add_resource('fanstatic', 'ckanext-timeline')
 
     def before_search(self, search_params):
+        '''
+        Adds start and end point coming from timeline to 'fq'
+        '''
         extras = search_params.get('extras')
         if not extras:
             # There are no extras in the search params, so do nothing.
@@ -78,7 +84,7 @@ class TimelinePlugin(plugins.SingletonPlugin):
 @ckan.logic.side_effect_free
 def timeline(context, request_data):
     '''
-    Return a list of points for a timeline plot
+    Returns a list of points for a timeline plot
 
     :param start: the start point in time
     :type start: int
@@ -86,8 +92,12 @@ def timeline(context, request_data):
     :type end: int
     :param method: the way to execute the queries
     :type method: str
+    :param q: the query to use
+    :type q: str
+    :param fq: the facet query to use
+    :type fq: str
 
-    :rtype: list
+    :rtype: list[int, int, int, int]
     '''
 
     #ckan.logic.check_access('timeline', context, request_data)
