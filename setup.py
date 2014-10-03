@@ -28,6 +28,6 @@ setup(
     [ckan.plugins]
     # Add plugins here, eg
     # myplugin=ckanext.timeline:PluginClass
-    timeline=ckanext.timeline.plugin:TimelineAPIPlugin
+    timeline=ckanext.timeline.plugin:TimelinePlugin
     """,
 )

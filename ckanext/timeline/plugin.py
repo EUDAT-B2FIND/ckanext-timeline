@@ -25,7 +25,7 @@ QUERY = '{sf}:[* TO {e}] AND {ef}:[{s} TO *]'
 RANGES = 100
 
 
-class TimelineAPIPlugin(plugins.SingletonPlugin):
+class TimelinePlugin(plugins.SingletonPlugin):
     '''
     Timeline plugin class that extends CKAN's functionality
     '''
