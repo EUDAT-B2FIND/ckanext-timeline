@@ -4,12 +4,6 @@
  * @license GNU Affero General Public License version 3 (AGPLv3)
  */
 
-const samples = 100;
-
-/** Contains the data for selected start and end points */
-var start_point;
-var end_point;
-
 /** Contains the x values for selected points [real, current-approximate] */
 var points = [];
 
@@ -140,7 +134,7 @@ $(function () {
             },
             xAxis: {
                 type: 'datetime',
-                minRange: samples * 1000,
+                minRange: 100 * 1000,
                 title: {
                     text: 'Time'
                 }
