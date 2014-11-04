@@ -10,6 +10,7 @@ from __future__ import absolute_import, with_statement, print_function, generato
 import logging
 import threading
 import multiprocessing
+from contextlib import closing
 
 import ckan.plugins as plugins
 import ckan.logic
@@ -119,28 +120,25 @@ def timeline(context, request_data):
     # Handle open/'*' start and end points
     if start == '*':
         try:
-            con = ckan.lib.search.make_connection()
-            start = con.query(q,
-                              fq=fq,
-                              fields=['id', '{f}'.format(f=START_FIELD)],
-                              sort=['{f} asc'.format(f=START_FIELD)],
-                              rows=1).results[0][START_FIELD]
+            # TODO! Add with-statement support to Solrpy
+            with closing(ckan.lib.search.make_connection()) as con:
+                start = con.query(q,
+                                  fq=fq,
+                                  fields=['id', '{f}'.format(f=START_FIELD)],
+                                  sort=['{f} asc'.format(f=START_FIELD)],
+                                  rows=1).results[0][START_FIELD]
         except:
             raise ckan.logic.ValidationError({'start': _('Could not find start value from Solr')})
-        finally:
-            con.close()
     if end == '*':
         try:
-            con = ckan.lib.search.make_connection()
-            end = con.query(q,
-                            fq=fq,
-                            fields=['id', '{f}'.format(f=END_FIELD)],
-                            sort=['{f} desc'.format(f=END_FIELD)],
-                            rows=1).results[0][END_FIELD]
+            with closing(ckan.lib.search.make_connection()) as con:
+                end = con.query(q,
+                                fq=fq,
+                                fields=['id', '{f}'.format(f=END_FIELD)],
+                                sort=['{f} desc'.format(f=END_FIELD)],
+                                rows=1).results[0][END_FIELD]
         except:
             raise ckan.logic.ValidationError({'end': _('Could not find end value from Solr')})
-        finally:
-            con.close()
 
     # Convert to ints
     start = int(start)
@@ -203,12 +201,11 @@ def ps(t):
     :rtype: (int, int, int, int)
     '''
     s, e, m, q, fq = t
-    solr = ckan.lib.search.make_connection()
-    n = solr.query(q,
-                   fq='{0} +{1}'.format(fq, QUERY.format(s=s, e=e, sf=START_FIELD, ef=END_FIELD)),
-                   fields=['id'],
-                   rows=0)
-    solr.close()
+    with closing(ckan.lib.search.make_connection()) as solr:
+        n = solr.query(q,
+                       fq='{0} +{1}'.format(fq, QUERY.format(s=s, e=e, sf=START_FIELD, ef=END_FIELD)),
+                       fields=['id'],
+                       rows=0)
     found = int(n._numFound)
 
     return s, e, m, found
