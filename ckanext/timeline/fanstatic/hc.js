@@ -181,16 +181,16 @@ $(function () {
                                         return a[0] > b[0];
                                     });
                                     if (points.length == 1) {
-                                        update_search_box(start_box, points[0][0]);
-                                        update_search_box(start_box_hidden, points[0][0]);
+                                        update_search_box(start_box, points[0][0], 'ms');
+                                        update_search_box(start_box_hidden, points[0][0], 'ms');
                                         update_search_box(end_box, '');
                                         update_search_box(end_box_hidden, '');
                                     }
                                     else if (points.length == 2) {
-                                        update_search_box(start_box, points[0][0]);
-                                        update_search_box(start_box_hidden, points[0][0]);
-                                        update_search_box(end_box, points[1][0]);
-                                        update_search_box(end_box_hidden, points[1][0]);
+                                        update_search_box(start_box, points[0][0], 'ms');
+                                        update_search_box(start_box_hidden, points[0][0], 'ms');
+                                        update_search_box(end_box, points[1][0], 'ms');
+                                        update_search_box(end_box_hidden, points[1][0], 'ms');
                                     }
                                     was_mouse_click = false;
                                 }
@@ -214,8 +214,8 @@ $(function () {
                                     }
                                     else if (points.length == 2) {
                                         points = points.filter(function (p) { return p[1] != this.x }, this);
-                                        update_search_box(start_box, points[0][0]);
-                                        update_search_box(start_box_hidden, points[0][0]);
+                                        update_search_box(start_box, points[0][0], 'ms');
+                                        update_search_box(start_box_hidden, points[0][0], 'ms');
                                         update_search_box(end_box, '');
                                         update_search_box(end_box_hidden, '');
                                     }
@@ -372,10 +372,19 @@ $(function () {
         });
     }
 
-    function update_search_box(jquery, unix_ms) {
+    /** Update a search box. Supports epoch and zero based times */
+    function update_search_box(jquery, val, format) {
         var c = '';
-        if (unix_ms) {
-            c = helpers.unixAsZeroBased(helpers.msToS(Number(unix_ms)));
+        if (val) {
+            if (format == 'ms') {
+                c = helpers.unixAsZeroBased(helpers.msToS(Number(val)));
+            }
+            else if (format == 's') {
+                c = helpers.unixAsZeroBased(Number(val));
+            }
+            else if (format == 'zero') {
+                c = Number(val);
+            }
         }
         jquery.val(c);
     }
