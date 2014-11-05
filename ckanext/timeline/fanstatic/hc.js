@@ -57,14 +57,20 @@ $(function () {
 
     /** Populate the timeline boxes, hidden fields and graph points */
     if (param_start) {
-        start_box.val(param_start);
-        start_box_hidden.val(param_start);
-        points.push(function (x) { return [x, x] }(helpers.sToMs(helpers.zeroBasedAsUnix(param_start))));
+        (function (zero, unix) {
+            update_search_box(start_box, zero, 'zero');
+            /** TODO: Hidden field should be filled by using copy_search_box */
+            update_search_box(start_box_hidden, zero, 'zero');
+            points.push(function (x) { return [x, x] }(unix));
+        })(param_start, helpers.sToMs(helpers.zeroBasedAsUnix(param_start)));
     }
     if (param_end) {
-        end_box.val(param_end);
-        end_box_hidden.val(param_end);
-        points.push(function (x) { return [x, x] }(helpers.sToMs(helpers.zeroBasedAsUnix(param_end))));
+        (function (zero, unix) {
+            update_search_box(end_box, zero, 'zero');
+            /** TODO: Hidden field should be filled by using copy_search_box */
+            update_search_box(end_box_hidden, zero, 'zero');
+            points.push(function (x) { return [x, x] }(unix));
+        })(param_end, helpers.sToMs(helpers.zeroBasedAsUnix(param_end)));
     }
 
     /** Create the graphs before showing the modal */
@@ -351,13 +357,14 @@ $(function () {
         if (t.val()) {
             v = t.val();
             const new_p = helpers.sToMs(helpers.zeroBasedAsUnix(Number(v)));
+            update_search_box(t, v, 'zero');
         }
         /** Check that jquery object's value isn't same, before setting */
         if (jquery.val() != v) {
             if (jquery.val()) {
                 const old_p = helpers.sToMs(helpers.zeroBasedAsUnix(Number(jquery.val())));
             }
-            jquery.val(v);
+            update_search_box(jquery, v, 'zero');
         }
 
         /** Update points for graph */
