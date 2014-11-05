@@ -55,6 +55,10 @@ $(function () {
     const param_start = $.urlParam('ext_timeline_start');
     const param_end = $.urlParam('ext_timeline_end');
 
+    /** Enable tooltips for search boxes */
+    start_box.tooltip({title: function () { return moment.unix(helpers.zeroBasedAsUnix(start_box.val())).utc().format() }});
+    end_box.tooltip({title: function () { return moment.unix(helpers.zeroBasedAsUnix(end_box.val())).utc().format() }});
+
     /** Populate the timeline boxes, hidden fields and graph points */
     if (param_start) {
         (function (zero, unix) {
@@ -357,14 +361,14 @@ $(function () {
         if (t.val()) {
             v = t.val();
             const new_p = helpers.sToMs(helpers.zeroBasedAsUnix(Number(v)));
-            update_search_box(t, v, 'zero');
+            update_search_box(t, v, 'zero', true);
         }
         /** Check that jquery object's value isn't same, before setting */
         if (jquery.val() != v) {
             if (jquery.val()) {
                 const old_p = helpers.sToMs(helpers.zeroBasedAsUnix(Number(jquery.val())));
             }
-            update_search_box(jquery, v, 'zero');
+            update_search_box(jquery, v, 'zero', true);
         }
 
         /** Update points for graph */
@@ -380,7 +384,7 @@ $(function () {
     }
 
     /** Update a search box. Supports epoch and zero based times */
-    function update_search_box(jquery, val, format) {
+    function update_search_box(jquery, val, format, tooltip) {
         var c = '';
         if (val) {
             if (format == 'ms') {
@@ -394,6 +398,7 @@ $(function () {
             }
         }
         jquery.val(c);
+        if (tooltip) { jquery.tooltip('show') }
     }
 });
 

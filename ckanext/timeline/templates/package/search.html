@@ -21,10 +21,10 @@
     <div class="module-content input-prepend" id="timeline">
       <div class="input-prepend">
           <span class="add-on">{{ _('Start') }}:</span>
-          <input type="number" class="span2" id="start" title="Human readable here!" data-toggle="tooltip"/>
+          <input type="number" class="span2" id="start" data-toggle="tooltip" data-placement="top" data-animation="false"/>
           <br/>
           <span class="add-on">{{ _('End') }}:</span>
-          <input type="number" class="span2" id="end" title="Human readable here!" data-toggle="tooltip"/>
+          <input type="number" class="span2" id="end" data-toggle="tooltip" data-placement="bottom" data-animation="false"/>
           <div hidden="">
               <span class="add-on">{{ _('q') }}:</span>
               <input type="text" class="span2" id="timeline-q" value="{{ c.timeline_q }}"/>
@@ -36,7 +36,7 @@
     </div>
     <div id="timelineModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:80%; margin-left:-40%">
         <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h3 id="myModalLabel">{{ _('Timeline') }}</h3>
         </div>
         <div class="modal-body" style="max-height:80%">
