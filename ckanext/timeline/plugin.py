@@ -10,6 +10,7 @@ from __future__ import absolute_import, with_statement, print_function, generato
 import logging
 import threading
 import multiprocessing
+import re
 from contextlib import closing
 
 import ckan.plugins as plugins
@@ -116,6 +117,9 @@ def timeline(context, request_data):
         raise ckan.logic.ValidationError({'end': _('Missing value')})
     if method not in ('s', 'p', 't'):
         raise ckan.logic.ValidationError({'method': _('Wrong value')})
+
+    # Remove existing timeline parameters from 'fq'
+    fq = re.sub(r' +\+{sf}:\[\* TO \d+\] AND {ef}:\[\d+ TO \*\]'.format(sf=START_FIELD, ef=END_FIELD), '', fq)
 
     # Handle open/'*' start and end points
     if start == '*':
