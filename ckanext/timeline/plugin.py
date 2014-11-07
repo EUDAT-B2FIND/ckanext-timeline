@@ -127,7 +127,7 @@ def timeline(context, request_data):
             # TODO! Add with-statement support to Solrpy
             with closing(ckan.lib.search.make_connection()) as con:
                 start = con.query(q,
-                                  fq=fq,
+                                  fq='{fq} +{f}:[* TO *]'.format(fq=fq, f=START_FIELD),
                                   fields=['id', '{f}'.format(f=START_FIELD)],
                                   sort=['{f} asc'.format(f=START_FIELD)],
                                   rows=1).results[0][START_FIELD]
@@ -137,7 +137,7 @@ def timeline(context, request_data):
         try:
             with closing(ckan.lib.search.make_connection()) as con:
                 end = con.query(q,
-                                fq=fq,
+                                fq='{fq} +{f}:[* TO *]'.format(fq=fq, f=END_FIELD),
                                 fields=['id', '{f}'.format(f=END_FIELD)],
                                 sort=['{f} desc'.format(f=END_FIELD)],
                                 rows=1).results[0][END_FIELD]
