@@ -145,14 +145,10 @@ $(function () {
             xAxis: {
                 type: 'datetime',
                 minRange: 100 * 1000,
-                title: {
-                    text: 'Time'
-                }
+                title: { text: 'Time' }
             },
             yAxis: {
-                title: {
-                    text: 'Datasets'
-                },
+                title: { text: 'Datasets' },
                 floor: 0
             },
             series: [
@@ -264,7 +260,7 @@ $(function () {
                         // type: 'column',
                         // type: 'spline',
                         zoomType: 'x',
-                        spacingLeft: 60,
+                        // spacingLeft: 60,
                         events: {
                             selection: function (event) {
                                 if (event.xAxis) {
@@ -302,17 +298,16 @@ $(function () {
                     title: { text: null },
                     xAxis: {
                         type: 'datetime',
-                        title: { enabled: false }
+                        title: { text: 'Years' }
                     },
                     yAxis: {
-                        title: { enabled: false },
+                        title: { text: 'Histogram' },
                         labels: { enabled: false },
                         min: 0
                     },
                     series: [
                         {
                             name: 'Datasets',
-                            /** Stupid random start values */
                             data: shallow_copy(small_chart_data)
                         }
                     ],
