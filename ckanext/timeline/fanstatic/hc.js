@@ -56,8 +56,8 @@ $(function () {
     const param_end = $.urlParam('ext_timeline_end');
 
     /** Enable tooltips for search boxes */
-    start_box.tooltip({title: function () { return moment.unix(helpers.zeroBasedAsUnix(start_box.val())).utc().format() }});
-    end_box.tooltip({title: function () { return moment.unix(helpers.zeroBasedAsUnix(end_box.val())).utc().format() }});
+    start_box.tooltip({title: function () { if (start_box.val()) return moment.unix(helpers.zeroBasedAsUnix(start_box.val())).utc().format() }});
+    end_box.tooltip({title: function () { if (end_box.val()) return moment.unix(helpers.zeroBasedAsUnix(end_box.val())).utc().format() }});
 
     /** Populate the timeline boxes, hidden fields and graph points */
     if (param_start) {
