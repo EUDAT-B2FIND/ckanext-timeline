@@ -79,7 +79,7 @@ $(function () {
 
     /** Create the graphs before showing the modal */
     $('#timelineModal').on('show', function () {
-        $('#big-chart').highcharts({
+        !$('#big-chart').highcharts() && $('#big-chart').highcharts({
             chart: {
                 type: 'line',
                 zoomType: 'x',
@@ -241,7 +241,7 @@ $(function () {
             legend: { enabled: false }
         });
 
-        $.getJSON(api_url,
+        !$('#small-chart').highcharts() && $.getJSON(api_url,
             {
                 start: '*',
                 end: '*',
@@ -329,8 +329,14 @@ $(function () {
 
     /** Reflow the graphs when showing the modal */
     $('#timelineModal').on('shown', function () {
-        $('#big-chart').highcharts().reflow();
-        $('#small-chart').highcharts().reflow();
+        if ($('#big-chart').highcharts()) {
+            $('#big-chart').highcharts().redraw();
+            $('#big-chart').highcharts().reflow();
+        }
+        if ($('#small-chart').highcharts()) {
+            $('#small-chart').highcharts().redraw();
+            $('#small-chart').highcharts().reflow();
+        }
     });
 
     /** Execute search after hiding the modal */
