@@ -92,13 +92,13 @@ $(function () {
                             const max = event.xAxis[0].max;
 
                             /** Update big-chart with new values */
-                            $.getJSON(api_url,
-                                {
+                            $.post(api_url,
+                                encodeURIComponent(JSON.stringify({
                                     start: parseInt(helpers.unixAsZeroBased(helpers.msToS(min))),
                                     end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max))),
                                     q: q_box.val(),
                                     fq: fq_box.val()
-                                },
+                                })),
                                 function (data) {
                                     series.setData(
                                         data.result.map(function (x) {
@@ -241,13 +241,13 @@ $(function () {
             legend: { enabled: false }
         });
 
-        !$('#small-chart').highcharts() && $.getJSON(api_url,
-            {
+        !$('#small-chart').highcharts() && $.post(api_url,
+            encodeURIComponent(JSON.stringify({
                 start: '*',
                 end: '*',
                 q: q_box.val(),
                 fq: fq_box.val()
-            },
+            })),
             function (data) {
                 small_chart_data = data.result.map(function (x) {
                     return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]];
@@ -268,13 +268,13 @@ $(function () {
                                     var max = event.xAxis[0].max;
 
                                     /** Update big-chart with new values */
-                                    $.getJSON(api_url,
-                                        {
+                                    $.post(api_url,
+                                        encodeURIComponent(JSON.stringify({
                                             start: parseInt(helpers.unixAsZeroBased(helpers.msToS(min))),
                                             end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max))),
                                             q: q_box.val(),
                                             fq: fq_box.val()
-                                        },
+                                        })),
                                         function (data) {
                                             big_chart_data = data.result.map(function (x) {
                                                 return [helpers.sToMs(helpers.zeroBasedAsUnix(x[2])), x[3]];
