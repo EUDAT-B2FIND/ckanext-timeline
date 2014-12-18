@@ -44,6 +44,7 @@ $(function () {
     end_box_hidden = $('#ext_timeline_end');
     const q_box = $('#timeline #timeline-q');
     const fq_box = $('#timeline #timeline-fq');
+    var temp_points = [];
 
     /** Define a new jQuery function to parse parameters from URL */
     $.urlParam = function(name) {
@@ -79,6 +80,8 @@ $(function () {
 
     /** Create the graphs before showing the modal */
     $('#timelineModal').on('show', function () {
+        temp_points = shallow_copy(points);
+
         !$('#big-chart').highcharts() && $('#big-chart').highcharts({
             chart: {
                 type: 'line',
@@ -123,7 +126,7 @@ $(function () {
 
                         /** Restore selected points if withing selected range
                          * NOTE! This approximates to the nearest point, as exact point might not exist */
-                        points && points.forEach(function (v) {
+                        temp_points && temp_points.forEach(function (v) {
                             const ext = chart.xAxis[0].getExtremes();
                             const real_point = v[0];
                             if (real_point >= ext.dataMin && real_point <= ext.dataMax) {
@@ -176,28 +179,16 @@ $(function () {
                                 }
 
                                 /** Prevent selection of more than 2 points */
-                                if (points.length > 1) {
+                                if (temp_points.length > 1) {
                                     if (!is_redraw) { return false }
                                 }
 
                                 /** Check that mouse was clicked */
                                 if (was_mouse_click) {
-                                    points.push([this.x, this.x]);
-                                    points.sort(function (a, b) {
+                                    temp_points.push([this.x, this.x]);
+                                    temp_points.sort(function (a, b) {
                                         return a[0] > b[0];
                                     });
-                                    if (points.length == 1) {
-                                        update_search_box(start_box, points[0][0], 'ms');
-                                        update_search_box(start_box_hidden, points[0][0], 'ms');
-                                        update_search_box(end_box, '');
-                                        update_search_box(end_box_hidden, '');
-                                    }
-                                    else if (points.length == 2) {
-                                        update_search_box(start_box, points[0][0], 'ms');
-                                        update_search_box(start_box_hidden, points[0][0], 'ms');
-                                        update_search_box(end_box, points[1][0], 'ms');
-                                        update_search_box(end_box_hidden, points[1][0], 'ms');
-                                    }
                                     was_mouse_click = false;
                                 }
                             },
@@ -211,19 +202,11 @@ $(function () {
                                 /** Check that mouse was clicked */
                                 if (was_mouse_click) {
                                     /** Remove point from points */
-                                    if (points.length == 1) {
-                                        points = [];
-                                        update_search_box(start_box, '');
-                                        update_search_box(start_box_hidden, '');
-                                        update_search_box(end_box, '');
-                                        update_search_box(end_box_hidden, '');
+                                    if (temp_points.length == 1) {
+                                        temp_points = [];
                                     }
-                                    else if (points.length == 2) {
-                                        points = points.filter(function (p) { return p[1] != this.x }, this);
-                                        update_search_box(start_box, points[0][0], 'ms');
-                                        update_search_box(start_box_hidden, points[0][0], 'ms');
-                                        update_search_box(end_box, '');
-                                        update_search_box(end_box_hidden, '');
+                                    else if (temp_points.length == 2) {
+                                        temp_points = temp_points.filter(function (p) { return p[1] != this.x }, this);
                                     }
                                     was_mouse_click = false;
                                 }
@@ -339,10 +322,20 @@ $(function () {
         }
     });
 
-    /** Execute search after hiding the modal */
-    $('#timelineModal').on('hidden', function () {
-        if (points.length == 2) {
-            form.submit();
+    /** Save points on clicking 'Save' */
+    $('#timelineModal').find('#save').on('click', function () {
+        points = shallow_copy(temp_points);
+        if (points.length == 1) {
+            update_search_box(start_box, points[0][0], 'ms');
+            update_search_box(start_box_hidden, points[0][0], 'ms');
+            update_search_box(end_box, '');
+            update_search_box(end_box_hidden, '');
+        }
+        else if (points.length == 2) {
+            update_search_box(start_box, points[0][0], 'ms');
+            update_search_box(start_box_hidden, points[0][0], 'ms');
+            update_search_box(end_box, points[1][0], 'ms');
+            update_search_box(end_box_hidden, points[1][0], 'ms');
         }
     });
 
