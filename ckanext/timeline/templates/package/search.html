@@ -36,20 +36,18 @@
           <input type="text" class="span2" id="timeline-fq" value="{{ c.timeline_fq }}"/>
       </div>
     </div>
-    <div id="timelineModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:80%; margin-left:-40%">
+    <div id="timelineModal" class="modal hide fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:80%; margin-left:-40%">
         <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h3 id="myModalLabel">{{ _('Timeline') }}</h3>
         </div>
         <div class="modal-body" style="max-height:80%">
             <div id="big-chart" style="width:98%; height:400px; max-height:40%"></div>
             <div id="small-chart" style="width:98%; height:120px; max-height:10%"></div>
         </div>
-        <!--
         <div class="modal-footer">
-            <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+            <button class="btn btn-primary" data-dismiss="modal" id="save">Save</button>
         </div>
-        -->
     </div>
   </section>
 
