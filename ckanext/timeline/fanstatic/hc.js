@@ -151,7 +151,7 @@ $(function () {
                 title: { text: 'Time' }
             },
             yAxis: {
-                title: { text: 'Datasets' },
+                title: { text: '# of datasets' },
                 floor: 0
             },
             series: [
@@ -217,6 +217,9 @@ $(function () {
                         }
                     }
                 }
+            },
+            tooltip: {
+                xDateFormat: '%Y-%m-%d %H:%M:%S'
             },
             /** Don't show credits link */
             credits: { enabled: false },
@@ -323,7 +326,7 @@ $(function () {
     });
 
     /** Save points on clicking 'Save' */
-    $('#timelineModal').find('#save').on('click', function () {
+    $('#timelineModal').find('#apply').on('click', function () {
         points = shallow_copy(temp_points);
         if (points.length == 1) {
             update_search_box(start_box, points[0][0], 'ms');
