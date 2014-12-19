@@ -119,7 +119,7 @@ def timeline(context, request_data):
         raise ckan.logic.ValidationError({'method': _('Wrong value')})
 
     # Remove existing timeline parameters from 'fq'
-    fq = re.sub(r' +\+{sf}:\[\* TO \d+\] AND {ef}:\[\d+ TO \*\]'.format(sf=START_FIELD, ef=END_FIELD), '', fq)
+    fq = re.sub(r' +\+{sf}:\[\* TO (\*|\d+)\] AND {ef}:\[(\*|\d+) TO \*\]'.format(sf=START_FIELD, ef=END_FIELD), '', fq)
 
     # Handle open/'*' start and end points
     if start == '*':
