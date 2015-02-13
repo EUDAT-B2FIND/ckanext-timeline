@@ -38,12 +38,13 @@ $(function () {
     $('<input type="hidden" id="ext_timeline_start" name="ext_timeline_start" />').appendTo(form);
     $('<input type="hidden" id="ext_timeline_end" name="ext_timeline_end" />').appendTo(form);
 
-    start_box = $('#timeline #start');
-    end_box = $('#timeline #end');
+    const timeline = $('#timeline');
+    start_box = timeline.find('#start');
+    end_box = timeline.find('#end');
     start_box_hidden = $('#ext_timeline_start');
     end_box_hidden = $('#ext_timeline_end');
-    const q_box = $('#timeline #timeline-q');
-    const fq_box = $('#timeline #timeline-fq');
+    const q_box = timeline.find('#timeline-q');
+    const fq_box = timeline.find('#timeline-fq');
     var temp_points = [];
 
     /** Define a new jQuery function to parse parameters from URL */
