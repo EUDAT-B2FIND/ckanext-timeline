@@ -26,7 +26,7 @@ var big_chart_data;
 var small_chart_data;
 
 /** Contains the URL for the CKAN API */
-const api_url = "http://eudat6a.dkrz.de/api/3/action/timeline";
+const api_url = "/api/3/action/timeline";
 
 $(function () {
     /** Add hidden <input> tags #ext_timeline_start and #ext_timeline_end to search form */
