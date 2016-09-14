@@ -11,6 +11,7 @@ import logging
 import threading
 import multiprocessing
 import re
+import json
 from contextlib import closing
 
 import ckan.plugins as plugins
@@ -76,7 +77,7 @@ class TimelinePlugin(plugins.SingletonPlugin):
         '''
 
         c.timeline_q = search_params.get('q', '')
-        c.timeline_fq = ' '.join(search_params.get('fq', []))
+        c.timeline_fq = json.dumps(search_params.get('fq', []))
 
         return search_results
 
