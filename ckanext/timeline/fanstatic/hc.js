@@ -101,7 +101,7 @@ $(function () {
                                     start: parseInt(helpers.unixAsZeroBased(helpers.msToS(min))),
                                     end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max))),
                                     q: q_box.val(),
-                                    fq: fq_box.val()
+                                    fq: JSON.parse(fq_box.val()),
                                 })),
                                 function (data) {
                                     series.setData(
@@ -233,7 +233,7 @@ $(function () {
                 start: '*',
                 end: '*',
                 q: q_box.val(),
-                fq: fq_box.val()
+                fq: JSON.parse(fq_box.val()),
             })),
             function (data) {
                 small_chart_data = data.result.map(function (x) {
@@ -260,7 +260,7 @@ $(function () {
                                             start: parseInt(helpers.unixAsZeroBased(helpers.msToS(min))),
                                             end: parseInt(helpers.unixAsZeroBased(helpers.msToS(max))),
                                             q: q_box.val(),
-                                            fq: fq_box.val()
+                                            fq: JSON.parse(fq_box.val()),
                                         })),
                                         function (data) {
                                             big_chart_data = data.result.map(function (x) {
