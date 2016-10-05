@@ -1,6 +1,6 @@
 /**
  * @author Mikael Karlsson <i8myshoes@gmail.com>
- * @copyright 2014-2015  CSC - IT Center for Science Ltd, Finland
+ * @copyright 2014-2016  CSC - IT Center for Science Ltd, Finland
  * @license GNU Affero General Public License version 3 (AGPLv3)
  */
 
