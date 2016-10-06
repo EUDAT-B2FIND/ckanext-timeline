@@ -65,7 +65,7 @@ class TimelinePlugin(plugins.SingletonPlugin):
             end_point = '*'
 
         # Add a time-range query with the selected start and/or end points into the Solr facet queries.
-        fq = search_params['fq']
+        fq = search_params.get('fq', '')
         fq = '{fq} +{q}'.format(fq=fq, q=QUERY).format(s=start_point, e=end_point, sf=START_FIELD, ef=END_FIELD)
         search_params['fq'] = fq
 
@@ -104,7 +104,7 @@ def timeline(context, request_data):
     :rtype: list[int, int, int, int]
     '''
 
-    #ckan.logic.check_access('timeline', context, request_data)
+    # ckan.logic.check_access('timeline', context, request_data)
 
     start = request_data.get('start')
     end = request_data.get('end')
