@@ -1,6 +1,6 @@
 '''
 :author: Mikael Karlsson <i8myshoes@gmail.com>
-:copyright: 2014  CSC - IT Center for Science Ltd, Finland
+:copyright: 2014-2016  CSC - IT Center for Science Ltd, Finland
 :license: GNU Affero General Public License version 3 (AGPLv3)
 '''
 
@@ -11,6 +11,7 @@ import logging
 import threading
 import multiprocessing
 import re
+import json
 from contextlib import closing
 
 import ckan.plugins as plugins
@@ -64,7 +65,7 @@ class TimelinePlugin(plugins.SingletonPlugin):
             end_point = '*'
 
         # Add a time-range query with the selected start and/or end points into the Solr facet queries.
-        fq = search_params['fq']
+        fq = search_params.get('fq', '')
         fq = '{fq} +{q}'.format(fq=fq, q=QUERY).format(s=start_point, e=end_point, sf=START_FIELD, ef=END_FIELD)
         search_params['fq'] = fq
 
@@ -76,12 +77,13 @@ class TimelinePlugin(plugins.SingletonPlugin):
         '''
 
         c.timeline_q = search_params.get('q', '')
-        c.timeline_fq = ' '.join(search_params.get('fq', []))
+        c.timeline_fq = json.dumps(search_params.get('fq', []))
 
         return search_results
 
     def get_actions(self):
         return {'timeline': timeline}
+
 
 @ckan.logic.side_effect_free
 def timeline(context, request_data):
@@ -102,13 +104,13 @@ def timeline(context, request_data):
     :rtype: list[int, int, int, int]
     '''
 
-    #ckan.logic.check_access('timeline', context, request_data)
+    # ckan.logic.check_access('timeline', context, request_data)
 
     start = request_data.get('start')
     end = request_data.get('end')
     method = request_data.get('method', 't')
     q = request_data.get('q', '*:*')
-    fq = request_data.get('fq', '')
+    fq = request_data.get('fq', [])
 
     # Validate values
     if start is None:
@@ -119,15 +121,16 @@ def timeline(context, request_data):
         raise ckan.logic.ValidationError({'method': _('Wrong value')})
 
     # Remove existing timeline parameters from 'fq'
-    fq = re.sub(r' +\+{sf}:\[\* TO (\*|\d+)\] AND {ef}:\[(\*|\d+) TO \*\]'.format(sf=START_FIELD, ef=END_FIELD), '', fq)
+    t_fq = fq.pop([i for i, x in enumerate(fq) if START_FIELD in x or END_FIELD in x or "dataset_type:dataset" in x][0])
+    t_fq = re.sub(r' +\+{sf}:\[\* TO (\*|\d+)\] AND {ef}:\[(\*|\d+) TO \*\]'.format(sf=START_FIELD, ef=END_FIELD), '', t_fq)
+    fq.append(t_fq)
 
     # Handle open/'*' start and end points
     if start == '*':
         try:
-            # TODO! Add with-statement support to Solrpy
             with closing(ckan.lib.search.make_connection()) as con:
                 start = con.query(q,
-                                  fq='{fq} +{f}:[* TO *]'.format(fq=fq, f=START_FIELD),
+                                  fq=fq + ['{f}:[* TO *]'.format(f=START_FIELD)],
                                   fields=['id', '{f}'.format(f=START_FIELD)],
                                   sort=['{f} asc'.format(f=START_FIELD)],
                                   rows=1).results[0][START_FIELD]
@@ -137,7 +140,7 @@ def timeline(context, request_data):
         try:
             with closing(ckan.lib.search.make_connection()) as con:
                 end = con.query(q,
-                                fq='{fq} +{f}:[* TO *]'.format(fq=fq, f=END_FIELD),
+                                fq=fq + ['{f}:[* TO *]'.format(f=END_FIELD)],
                                 fields=['id', '{f}'.format(f=END_FIELD)],
                                 sort=['{f} desc'.format(f=END_FIELD)],
                                 rows=1).results[0][END_FIELD]
@@ -201,13 +204,13 @@ def ps(t):
     Makes a request to Solr and returns the result
 
     :param t: Tuple containing "start", "end", "mean", "q" and "fq" values
-    :type t: (int, int, int, str, str)
+    :type t: (int, int, int, str, [str])
     :rtype: (int, int, int, int)
     '''
     s, e, m, q, fq = t
     with closing(ckan.lib.search.make_connection()) as solr:
         n = solr.query(q,
-                       fq='{0} +{1}'.format(fq, QUERY.format(s=s, e=e, sf=START_FIELD, ef=END_FIELD)),
+                       fq=fq + ['{0}'.format(QUERY.format(s=s, e=e, sf=START_FIELD, ef=END_FIELD))],
                        fields=['id'],
                        rows=0)
     found = int(n._numFound)

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ckanext-timeline',
-    version='0.2.2',
+    version='0.3.0',
     description='CKAN extension for timeline facet',
     long_description=
     '''
