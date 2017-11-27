@@ -92,6 +92,8 @@ $(function () {
     $('#timelineModal').on('show', function () {
         temp_points = shallow_copy(points);
 
+        if(temp_points.length > 0) { $('#timelineModal').find('#apply').attr('disabled', false) }
+
         !$('#big-chart').highcharts() && $('#big-chart').highcharts({
             chart: {
                 type: 'line',
@@ -199,6 +201,7 @@ $(function () {
                                     temp_points.sort(function (a, b) {
                                         return a[0] > b[0];
                                     });
+                                    $('#timelineModal').find('#apply').attr('disabled', false);
                                     was_mouse_click = false;
                                 }
                             },
@@ -214,6 +217,7 @@ $(function () {
                                     /** Remove point from points */
                                     if (temp_points.length == 1) {
                                         temp_points = [];
+                                        $('#timelineModal').find('#apply').attr('disabled', true);
                                     }
                                     else if (temp_points.length == 2) {
                                         temp_points = temp_points.filter(function (p) { return p[1] != this.x }, this);
