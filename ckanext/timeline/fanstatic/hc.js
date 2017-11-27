@@ -105,6 +105,7 @@ $(function () {
                         if (event.xAxis) {
                             const min = event.xAxis[0].min;
                             const max = event.xAxis[0].max;
+                            console.log("Big chart: ", min, max);
 
                             /** Update big-chart with new values */
                             $.post(api_url,
@@ -133,6 +134,8 @@ $(function () {
                         const series = chart.series[0];
                         is_redraw = true;
 
+                        console.log("Redraw called!");
+
                         /** Clear selected points */
                         chart.getSelectedPoints().forEach(function (p) { p.select(false, true) });
 
@@ -141,9 +144,13 @@ $(function () {
                         temp_points && temp_points.forEach(function (v) {
                             const ext = chart.xAxis[0].getExtremes();
                             const real_point = v[0];
+    //                        console.log("extremes:", ext);
                             if (real_point >= ext.dataMin && real_point <= ext.dataMax) {
+                                console.log("Point in new range:", v);
+
                                 /** Find the nearest point and select it */
                                 const np = nearestNumValue(series.data.map(function (p) { return p.x }), real_point);
+                                console.log("Nearest point:", np);
                                 series.data[np[2]].select(true, true);
 
                                 /** Save chosen point */
@@ -184,6 +191,8 @@ $(function () {
                             select: function (event) {
                                 var chart = $('#big-chart').highcharts();
 
+                                console.log("Select!", this.x, this.y);
+
                                 /** Prevent non-accumulate clicks */
                                 if (!event.accumulate) {
                                     was_mouse_click = false;
@@ -192,6 +201,8 @@ $(function () {
 
                                 /** Prevent selection of more than 2 points */
                                 if (temp_points.length > 1) {
+                                    console.log("Selected points:", temp_points.length);
+                                    console.log("Visible points:", chart.getSelectedPoints().length);
                                     if (!is_redraw) { return false }
                                 }
 
@@ -204,8 +215,15 @@ $(function () {
                                     $('#timelineModal').find('#apply').attr('disabled', false);
                                     was_mouse_click = false;
                                 }
+                                else {
+                                    console.log("Programmatic select!");
+                                }
+
+                                console.log("Points:", temp_points);
                             },
                             unselect: function (event) {
+                                console.log("Unselect!", this.x, this.y);
+
                                 /** Prevent non-accumulate clicks */
                                 if (!event.accumulate) {
                                     was_mouse_click = false;
@@ -222,8 +240,16 @@ $(function () {
                                     else if (temp_points.length == 2) {
                                         temp_points = temp_points.filter(function (p) { return p[1] != this.x }, this);
                                     }
+                                    else {
+                                        console.log("This should NOT have happened!");
+                                    }
                                     was_mouse_click = false;
                                 }
+                                else {
+                                    console.log("Programmatic unselect!");
+                                }
+
+                                console.log("Points:", temp_points);
                             },
                             click: function (event) {
                                 was_mouse_click = true;
@@ -266,6 +292,7 @@ $(function () {
                                 if (event.xAxis) {
                                     var min = event.xAxis[0].min;
                                     var max = event.xAxis[0].max;
+                                    console.log("Small chart: ", min, max);
 
                                     /** Update big-chart with new values */
                                     $.post(api_url,
@@ -383,15 +410,19 @@ $(function () {
         }
 
         /** Update points for graph */
+        console.log('Points', points);
         if (old_p) {
+            console.log('Filter');
             points = points.filter(function (x) { return x[0] != old_p; });
         }
         if (new_p) {
+            console.log('Push');
             points.push([new_p, new_p]);
         }
         points.sort(function (a, b) {
             return a[0] > b[0];
         });
+        console.log('Points', points);
     }
 
     /** Update a search box. Supports epoch and zero based times */
@@ -481,7 +512,9 @@ helpers.generateRandomData = function (stime, n) {
 helpers.generateRandomDataEnd = function (stime, etime, n) {
     var data = [];
 
+    console.log(stime, etime, n);
     const step = (etime - stime) / n;
+    console.log("step = ", step);
 
     for (var i = 0, start = stime; i < n; i++) {
         data.push([
