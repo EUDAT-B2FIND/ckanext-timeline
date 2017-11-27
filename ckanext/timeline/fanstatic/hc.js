@@ -79,6 +79,15 @@ $(function () {
         })(param_end, helpers.sToMs(helpers.zeroBasedAsUnix(param_end)));
     }
 
+    /** Configure the modal's help button */
+    $('#help').popover({
+        content: 'Please select an area from the lower chart.' +
+        ' Then zoom in to wanted depth by selecting an area several times and zoom out by clicking "Reset zoom".' +
+        ' While doing this select a start point and an end point.' +
+        ' Once done click "Save" to accept the selected points or "Cancel" to discard selections.'
+    });
+    $('#help').popover('hide');
+
     /** Create the graphs before showing the modal */
     $('#timelineModal').on('show', function () {
         temp_points = shallow_copy(points);
