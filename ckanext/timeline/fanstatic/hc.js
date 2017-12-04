@@ -57,14 +57,14 @@ $(function () {
     const param_start = $.urlParam('ext_timeline_start');
     const param_end = $.urlParam('ext_timeline_end');
 
-    /** Enable tooltips for search boxes */
-    start_box.tooltip({title: function () { if (start_box.val()) return moment.unix(helpers.zeroBasedAsUnix(start_box.val())).utc().format() }});
-    end_box.tooltip({title: function () { if (end_box.val()) return moment.unix(helpers.zeroBasedAsUnix(end_box.val())).utc().format() }});
+    /** Enable human readable datetime tooltips for search boxes */
+    start_box.tooltip({title: function () { if (start_box.val()) return helpers.datetimeAsZeroBased(start_box.val()) }});
+    end_box.tooltip({title: function () { if (end_box.val()) return helpers.datetimeAsZeroBased(end_box.val()) }});
 
     /** Populate the timeline boxes, hidden fields and graph points */
     if (param_start) {
         (function (zero, unix) {
-            update_search_box(start_box, zero, 'zero');
+            update_search_box(start_box, zero, 'zero2dt');
             /** TODO: Hidden field should be filled by using copy_search_box */
             update_search_box(start_box_hidden, zero, 'zero');
             points.push(function (x) { return [x, x] }(unix));
@@ -72,7 +72,7 @@ $(function () {
     }
     if (param_end) {
         (function (zero, unix) {
-            update_search_box(end_box, zero, 'zero');
+            update_search_box(end_box, zero, 'zero2dt');
             /** TODO: Hidden field should be filled by using copy_search_box */
             update_search_box(end_box_hidden, zero, 'zero');
             points.push(function (x) { return [x, x] }(unix));
@@ -326,7 +326,7 @@ $(function () {
         }
     });
 
-    /** Save points on clicking 'Save' */
+    /** Save points on clicking 'Apply' */
     $('#timelineModal').find('#apply').on('click', function () {
         points = shallow_copy(temp_points);
         if (points.length == 1) {
@@ -358,15 +358,15 @@ $(function () {
         /** Check that 'this' element has a value */
         if (t.val()) {
             v = t.val();
-            const new_p = helpers.sToMs(helpers.zeroBasedAsUnix(Number(v)));
-            update_search_box(t, v, 'zero', true);
+            const new_p = helpers.sToMs(helpers.datetimeAsUnix(v));
+            update_search_box(t, v, 'dt', true);
         }
         /** Check that jquery object's value isn't same, before setting */
         if (jquery.val() != v) {
             if (jquery.val()) {
                 const old_p = helpers.sToMs(helpers.zeroBasedAsUnix(Number(jquery.val())));
             }
-            update_search_box(jquery, v, 'zero', true);
+            update_search_box(jquery, v, 'dt2zero', true);
         }
 
         /** Update points for graph */
@@ -393,6 +393,22 @@ $(function () {
             }
             else if (format == 'zero') {
                 c = Number(val);
+            }
+            else if (format == 'dt' || format == 'dt2zero') {
+                if (moment.utc(val, moment.ISO_8601, true).isValid()) {
+                    c = moment.utc(val, moment.ISO_8601, true)
+                }
+                else if (parseInt(val)) {
+                    c = moment.utc({'year': parseInt(val)})
+                }
+                if (format == 'dt') {
+                    c = c.format("YYYY-MM-DD HH:mm:ss")
+                } else if (format == 'dt2zero'){
+                    c = helpers.datetimeAsZeroBased(c)
+                }
+            }
+            else if (format == 'zero2dt'){
+                c = helpers.zeroBasedAsDatetime(val)
             }
         }
         jquery.val(c);
@@ -433,6 +449,21 @@ helpers.msToS = function (ms) {
 /** Converts seconds to milliseconds */
 helpers.sToMs = function (s) {
     return s * 1000;
+};
+
+/** dt should be local non-UTC datetime as "2017-03-18 21:15:45" "2017-03-18 21:15" "2017-03-18" "2017-03" "2017" */
+helpers.datetimeAsUnix = function (dt) {
+    return moment.utc(dt).unix();
+};
+
+/** dt should be local non-UTC datetime as "2017-03-18 21:15:45" "2017-03-18 21:15" "2017-03-18" "2017-03" "2017" */
+helpers.datetimeAsZeroBased = function (dt) {
+    return helpers.unixAsZeroBased(helpers.datetimeAsUnix(dt));
+};
+
+/** zb should be seconds from Year 0 in UTC, as Number or String */
+helpers.zeroBasedAsDatetime = function (zb) {
+    return moment.unix(helpers.zeroBasedAsUnix(zb)).utc().format("YYYY-MM-DD HH:mm:ss");
 };
 
 /** Generates a random integer between min and max */

@@ -18,12 +18,16 @@
     <div class="module-content input-prepend" id="timeline">
       <div class="input-prepend">
           <span class="add-on">{{ _('Start') }}:</span>
-          <input type="number" class="span2" id="start" data-toggle="tooltip" data-placement="top" data-animation="false"/>
+          <input type="text" class="span2" id="start" data-toggle="tooltip" data-placement="top"
+                 data-animation="false"
+                 pattern="-?[0-9]{1,5}(-[0-1][0-9](-[0-3][0-9]( [0-2][0-9]:[0-5][0-9](:[0-5][0-9])?)?)?)?"/>
       </div>
       <br/>
       <div class="input-prepend" style="margin-bottom: unset">
           <span class="add-on">{{ _('End') }}:</span>
-          <input type="number" class="span2" id="end" data-toggle="tooltip" data-placement="bottom" data-animation="false"/>
+          <input type="text" class="span2" id="end" data-toggle="tooltip" data-placement="bottom"
+                 data-animation="false"
+                 pattern="-?[0-9]{1,5}(-[0-1][0-9](-[0-3][0-9]( [0-2][0-9]:[0-5][0-9](:[0-5][0-9])?)?)?)?"/>
       </div>
       <div class="input-prepend" hidden="">
           <span class="add-on">{{ _('q') }}:</span>
