@@ -384,6 +384,7 @@ $(function () {
     /** Update a search box. Supports epoch and zero based times */
     function update_search_box(jquery, val, format, tooltip) {
         var c = '';
+        var timeResolution = ['year', 'month', 'date', 'hour', 'minute', 'second'];
         if (val) {
             if (format == 'ms') {
                 c = helpers.unixAsZeroBased(helpers.msToS(Number(val)));
@@ -395,11 +396,20 @@ $(function () {
                 c = Number(val);
             }
             else if (format == 'dt' || format == 'dt2zero') {
-                if (moment.utc(val, moment.ISO_8601, true).isValid()) {
-                    c = moment.utc(val, moment.ISO_8601, true)
+                if (moment.utc(val.trim(), moment.ISO_8601, true).isValid()) {
+                    c = moment.utc(val.trim(), moment.ISO_8601, true);
+                    /* Pick the end of year for end boxes. */
+                    if (jquery.is('#end, #ext_timeline_end')) {
+                        var tr = c.parsingFlags().parsedDateParts.length;
+                        c.endOf(timeResolution[tr-1]);
+                    }
                 }
                 else if (parseInt(val)) {
-                    c = moment.utc({'year': parseInt(val)})
+                    c = moment.utc({'year': parseInt(val)});
+                    /* Pick the end of year for end boxes. */
+                    if (jquery.is('#end, #ext_timeline_end')) {
+                        c.endOf('year');
+                    }
                 }
                 if (format == 'dt') {
                     c = c.format("YYYY-MM-DD HH:mm:ss")
