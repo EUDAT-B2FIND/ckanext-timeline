@@ -396,25 +396,28 @@ $(function () {
                 c = Number(val);
             }
             else if (format == 'dt' || format == 'dt2zero') {
+                var m = 0;
                 if (moment.utc(val.trim(), moment.ISO_8601, true).isValid()) {
-                    c = moment.utc(val.trim(), moment.ISO_8601, true);
+                    m = moment.utc(val.trim(), moment.ISO_8601, true);
                     /* Pick the end of year for end boxes. */
                     if (jquery.is('#end, #ext_timeline_end')) {
-                        var tr = c.parsingFlags().parsedDateParts.length;
-                        c.endOf(timeResolution[tr-1]);
+                        var tr = m.parsingFlags().parsedDateParts.length;
+                        m.endOf(timeResolution[tr-1]);
                     }
                 }
-                else if (parseInt(val)) {
-                    c = moment.utc({'year': parseInt(val)});
+                else if (!isNaN(parseInt(val))) {
+                    m = moment.utc({'year': parseInt(val)});
                     /* Pick the end of year for end boxes. */
                     if (jquery.is('#end, #ext_timeline_end')) {
-                        c.endOf('year');
+                        m.endOf('year');
                     }
                 }
-                if (format == 'dt') {
-                    c = c.format("YYYY-MM-DD HH:mm:ss")
-                } else if (format == 'dt2zero'){
-                    c = helpers.datetimeAsZeroBased(c)
+                if (m !== 0) {
+                    if (format == 'dt') {
+                        c = m.format("YYYY-MM-DD HH:mm:ss")
+                    } else if (format == 'dt2zero') {
+                        c = helpers.datetimeAsZeroBased(m)
+                    }
                 }
             }
             else if (format == 'zero2dt'){
