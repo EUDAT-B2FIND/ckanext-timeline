@@ -330,15 +330,15 @@ $(function () {
     $('#timelineModal').find('#apply').on('click', function () {
         points = shallow_copy(temp_points);
         if (points.length == 1) {
-            update_search_box(start_box, points[0][0], 'ms');
+            update_search_box(start_box, points[0][0], 'ms2dt');
             update_search_box(start_box_hidden, points[0][0], 'ms');
             update_search_box(end_box, '');
             update_search_box(end_box_hidden, '');
         }
         else if (points.length == 2) {
-            update_search_box(start_box, points[0][0], 'ms');
+            update_search_box(start_box, points[0][0], 'ms2dt');
             update_search_box(start_box_hidden, points[0][0], 'ms');
-            update_search_box(end_box, points[1][0], 'ms');
+            update_search_box(end_box, points[1][0], 'ms2dt');
             update_search_box(end_box_hidden, points[1][0], 'ms');
         }
     });
@@ -422,6 +422,9 @@ $(function () {
             }
             else if (format == 'zero2dt'){
                 c = helpers.zeroBasedAsDatetime(val)
+            }
+            else if (format == 'ms2dt'){
+                c = helpers.zeroBasedAsDatetime(helpers.unixAsZeroBased(helpers.msToS(Number(val))));
             }
         }
         jquery.val(c);
