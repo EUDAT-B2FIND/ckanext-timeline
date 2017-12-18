@@ -15,17 +15,17 @@
       <a href="#timelineModal" data-toggle="modal">{{ _('Filter by time') }}</a>
       <a href="{{ h.remove_url_param(['ext_timeline_start', 'ext_timeline_end']) }}" class="action">{{ _('Clear') }}</a>
     </h2>
-    <div class="module-content input-prepend" id="timeline">
-      <div class="input-prepend">
-          <span class="add-on">{{ _('Start') }}:</span>
-          <input type="text" class="span2" id="start" data-toggle="tooltip" data-placement="top"
+    <div class="module-content" id="timeline">
+      <div>
+          <label for="start" class="search-time-label add-on">{{ _('Start') }}</label>
+          <input class="search-time-box" type="text" id="start" data-toggle="tooltip" data-placement="top"
                  data-animation="false" placeholder="-0342-06-13"
                  pattern="[-\+]?[0-9]{1,6}(-[0-1][0-9](-[0-3][0-9]( [0-2][0-9](:[0-5][0-9](:[0-5][0-9])?)?)?)?)?"/>
       </div>
       <br/>
-      <div class="input-prepend" style="margin-bottom: unset">
-          <span class="add-on">{{ _('End') }}:</span>
-          <input type="text" class="span2" id="end" data-toggle="tooltip" data-placement="bottom"
+      <div>
+          <label for="end" class="search-time-label add-on">{{ _('End') }}</label>
+          <input class="search-time-box" type="text" id="end" data-toggle="tooltip" data-placement="bottom"
                  data-animation="false" placeholder="1504-12-31 18:20:41"
                  pattern="[-\+]?[0-9]{1,6}(-[0-1][0-9](-[0-3][0-9]( [0-2][0-9](:[0-5][0-9](:[0-5][0-9])?)?)?)?)?"/>
       </div>

@@ -42,7 +42,8 @@ class TimelinePlugin(plugins.SingletonPlugin):
         Adds template and static directories to config
         '''
         toolkit.add_template_directory(config, 'templates')
-        toolkit.add_resource('fanstatic', 'ckanext-timeline')
+        toolkit.add_public_directory(config, 'public')
+        toolkit.add_resource('public', 'ckanext-timeline')
 
     def before_search(self, search_params):
         '''
