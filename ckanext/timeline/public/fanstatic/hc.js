@@ -400,7 +400,7 @@ $(function () {
                 if (moment.utc(val.trim(), moment.ISO_8601, true).isValid()) {
                     m = moment.utc(val.trim(), moment.ISO_8601, true);
                     /* Pick the end of year for end boxes. */
-                    if (jquery.is('#end, #ext_timeline_end')) {
+                    if (jquery[0] === end_box[0] || jquery[0] === end_box_hidden[0]) {
                         var tr = m.parsingFlags().parsedDateParts.length;
                         m.endOf(timeResolution[tr-1]);
                     }
@@ -408,20 +408,20 @@ $(function () {
                 else if (!isNaN(parseInt(val))) {
                     m = moment.utc({'year': parseInt(val)});
                     /* Pick the end of year for end boxes. */
-                    if (jquery.is('#end, #ext_timeline_end')) {
+                    if (jquery[0] === end_box[0] || jquery[0] === end_box_hidden[0]) {
                         m.endOf('year');
                     }
                 }
                 if (m !== 0) {
                     if (format == 'dt') {
-                        c = m.format("YYYY-MM-DD HH:mm:ss")
+                        c = m.format("YYYY-MM-DD HH:mm:ss");
                     } else if (format == 'dt2zero') {
-                        c = helpers.datetimeAsZeroBased(m)
+                        c = helpers.datetimeAsZeroBased(m);
                     }
                 }
             }
             else if (format == 'zero2dt'){
-                c = helpers.zeroBasedAsDatetime(val)
+                c = helpers.zeroBasedAsDatetime(val);
             }
             else if (format == 'ms2dt'){
                 c = helpers.zeroBasedAsDatetime(helpers.unixAsZeroBased(helpers.msToS(Number(val))));
