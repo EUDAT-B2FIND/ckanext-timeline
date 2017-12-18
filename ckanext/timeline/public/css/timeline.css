@@ -1,0 +1,17 @@
+.search-time-label {
+  width: 36px;
+  font-weight: normal;
+  text-align: center;
+  background-color: #eeeeee;
+  padding: 2px 8px 1px 8px;
+  border: 1px solid #ccc;
+  border-bottom-style: none;
+  border-top-right-radius: 15px;
+  border-top-left-radius: 15px;
+  margin-bottom: 0;
+}
+.search-time-box {
+  width: inherit;
+  text-align: center;
+  border-top-left-radius: 0;
+}
