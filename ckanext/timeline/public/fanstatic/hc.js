@@ -341,6 +341,7 @@ $(function () {
             update_search_box(end_box, points[1][0], 'ms2dt');
             update_search_box(end_box_hidden, points[1][0], 'ms');
         }
+        form.submit()
     });
 
     /** Set onchange triggers for search boxes */
