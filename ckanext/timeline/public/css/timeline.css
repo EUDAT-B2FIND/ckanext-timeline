@@ -15,3 +15,20 @@
   text-align: center;
   border-top-left-radius: 0;
 }
+.modal.fade.in {
+  width: 80%;
+  max-height: calc(100vh - 50px);
+  top: 5%;
+  left: 50%;
+  margin-left: -40%;
+}
+.modal.fade.in .modal-body {
+  padding: 10px 5px;
+  height: calc(100vh - 50px - 49px - 60px);
+}
+.modal.fade.in .modal-body #big-chart {
+  height: 75%;
+}
+.modal.fade.in .modal-body #small-chart {
+  height: 25%;
+}
