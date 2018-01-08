@@ -45,6 +45,7 @@ $(function () {
     end_box_hidden = $('#ext_timeline_end');
     const q_box = timeline.find('#timeline-q');
     const fq_box = timeline.find('#timeline-fq');
+    const cancel_btn = $('.cancel');
     var temp_points = [];
 
     /** Define a new jQuery function to parse parameters from URL */
@@ -314,7 +315,7 @@ $(function () {
         );
     });
 
-    /** Reflow the graphs when showing the modal */
+    /** Reflow the graphs when showing the modal, attach closing on clicking outside modal */
     $('#timelineModal').on('shown', function () {
         if ($('#big-chart').highcharts()) {
             $('#big-chart').highcharts().redraw();
@@ -324,6 +325,9 @@ $(function () {
             $('#small-chart').highcharts().redraw();
             $('#small-chart').highcharts().reflow();
         }
+        $('.modal-backdrop').click(function(e) {
+            cancel_btn.click();
+        });
     });
 
     /** Save points on clicking 'Apply' */
@@ -342,6 +346,11 @@ $(function () {
             update_search_box(end_box_hidden, points[1][0], 'ms');
         }
         form.submit()
+    });
+
+    /** Close the modal on pressing 'ESC' key */
+    $('#timelineModal').keyup(function(e) {
+        if (e.keyCode === 27) cancel_btn.click();   // esc
     });
 
     /** Set onchange triggers for search boxes */
