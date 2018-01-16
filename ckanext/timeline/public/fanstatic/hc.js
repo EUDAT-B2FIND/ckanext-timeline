@@ -45,6 +45,7 @@ $(function () {
     end_box_hidden = $('#ext_timeline_end');
     const q_box = timeline.find('#timeline-q');
     const fq_box = timeline.find('#timeline-fq');
+    const cancel_btn = $('.cancel');
     var temp_points = [];
 
     /** Define a new jQuery function to parse parameters from URL */
@@ -57,14 +58,14 @@ $(function () {
     const param_start = $.urlParam('ext_timeline_start');
     const param_end = $.urlParam('ext_timeline_end');
 
-    /** Enable tooltips for search boxes */
-    start_box.tooltip({title: function () { if (start_box.val()) return moment.unix(helpers.zeroBasedAsUnix(start_box.val())).utc().format() }});
-    end_box.tooltip({title: function () { if (end_box.val()) return moment.unix(helpers.zeroBasedAsUnix(end_box.val())).utc().format() }});
+    /** Enable human readable datetime tooltips for search boxes */
+    start_box.tooltip({title: function () { if (start_box.val()) return helpers.datetimeAsZeroBased(start_box.val()) }});
+    end_box.tooltip({title: function () { if (end_box.val()) return helpers.datetimeAsZeroBased(end_box.val()) }});
 
     /** Populate the timeline boxes, hidden fields and graph points */
     if (param_start) {
         (function (zero, unix) {
-            update_search_box(start_box, zero, 'zero');
+            update_search_box(start_box, zero, 'zero2dt');
             /** TODO: Hidden field should be filled by using copy_search_box */
             update_search_box(start_box_hidden, zero, 'zero');
             points.push(function (x) { return [x, x] }(unix));
@@ -72,7 +73,7 @@ $(function () {
     }
     if (param_end) {
         (function (zero, unix) {
-            update_search_box(end_box, zero, 'zero');
+            update_search_box(end_box, zero, 'zero2dt');
             /** TODO: Hidden field should be filled by using copy_search_box */
             update_search_box(end_box_hidden, zero, 'zero');
             points.push(function (x) { return [x, x] }(unix));
@@ -314,7 +315,7 @@ $(function () {
         );
     });
 
-    /** Reflow the graphs when showing the modal */
+    /** Reflow the graphs when showing the modal, attach closing on clicking outside modal */
     $('#timelineModal').on('shown', function () {
         if ($('#big-chart').highcharts()) {
             $('#big-chart').highcharts().redraw();
@@ -324,23 +325,32 @@ $(function () {
             $('#small-chart').highcharts().redraw();
             $('#small-chart').highcharts().reflow();
         }
+        $('.modal-backdrop').click(function(e) {
+            cancel_btn.click();
+        });
     });
 
-    /** Save points on clicking 'Save' */
+    /** Save points on clicking 'Apply' */
     $('#timelineModal').find('#apply').on('click', function () {
         points = shallow_copy(temp_points);
         if (points.length == 1) {
-            update_search_box(start_box, points[0][0], 'ms');
+            update_search_box(start_box, points[0][0], 'ms2dt');
             update_search_box(start_box_hidden, points[0][0], 'ms');
             update_search_box(end_box, '');
             update_search_box(end_box_hidden, '');
         }
         else if (points.length == 2) {
-            update_search_box(start_box, points[0][0], 'ms');
+            update_search_box(start_box, points[0][0], 'ms2dt');
             update_search_box(start_box_hidden, points[0][0], 'ms');
-            update_search_box(end_box, points[1][0], 'ms');
+            update_search_box(end_box, points[1][0], 'ms2dt');
             update_search_box(end_box_hidden, points[1][0], 'ms');
         }
+        form.submit()
+    });
+
+    /** Close the modal on pressing 'ESC' key */
+    $('#timelineModal').keyup(function(e) {
+        if (e.keyCode === 27) cancel_btn.click();   // esc
     });
 
     /** Set onchange triggers for search boxes */
@@ -358,15 +368,15 @@ $(function () {
         /** Check that 'this' element has a value */
         if (t.val()) {
             v = t.val();
-            const new_p = helpers.sToMs(helpers.zeroBasedAsUnix(Number(v)));
-            update_search_box(t, v, 'zero', true);
+            const new_p = helpers.sToMs(helpers.datetimeAsUnix(v));
+            update_search_box(t, v, 'dt', true);
         }
         /** Check that jquery object's value isn't same, before setting */
         if (jquery.val() != v) {
             if (jquery.val()) {
                 const old_p = helpers.sToMs(helpers.zeroBasedAsUnix(Number(jquery.val())));
             }
-            update_search_box(jquery, v, 'zero', true);
+            update_search_box(jquery, v, 'dt2zero', true);
         }
 
         /** Update points for graph */
@@ -384,6 +394,7 @@ $(function () {
     /** Update a search box. Supports epoch and zero based times */
     function update_search_box(jquery, val, format, tooltip) {
         var c = '';
+        var timeResolution = ['year', 'month', 'date', 'hour', 'minute', 'second'];
         if (val) {
             if (format == 'ms') {
                 c = helpers.unixAsZeroBased(helpers.msToS(Number(val)));
@@ -393,6 +404,37 @@ $(function () {
             }
             else if (format == 'zero') {
                 c = Number(val);
+            }
+            else if (format == 'dt' || format == 'dt2zero') {
+                var m = 0;
+                if (moment.utc(val.trim(), moment.ISO_8601, true).isValid()) {
+                    m = moment.utc(val.trim(), moment.ISO_8601, true);
+                    /* Pick the end of year for end boxes. */
+                    if (jquery[0] === end_box[0] || jquery[0] === end_box_hidden[0]) {
+                        var tr = m.parsingFlags().parsedDateParts.length;
+                        m.endOf(timeResolution[tr-1]);
+                    }
+                }
+                else if (!isNaN(parseInt(val))) {
+                    m = moment.utc({'year': parseInt(val)});
+                    /* Pick the end of year for end boxes. */
+                    if (jquery[0] === end_box[0] || jquery[0] === end_box_hidden[0]) {
+                        m.endOf('year');
+                    }
+                }
+                if (m !== 0) {
+                    if (format == 'dt') {
+                        c = m.format("YYYY-MM-DD HH:mm:ss");
+                    } else if (format == 'dt2zero') {
+                        c = helpers.datetimeAsZeroBased(m);
+                    }
+                }
+            }
+            else if (format == 'zero2dt'){
+                c = helpers.zeroBasedAsDatetime(val);
+            }
+            else if (format == 'ms2dt'){
+                c = helpers.zeroBasedAsDatetime(helpers.unixAsZeroBased(helpers.msToS(Number(val))));
             }
         }
         jquery.val(c);
@@ -433,6 +475,21 @@ helpers.msToS = function (ms) {
 /** Converts seconds to milliseconds */
 helpers.sToMs = function (s) {
     return s * 1000;
+};
+
+/** dt should be local non-UTC datetime as "2017-03-18 21:15:45" "2017-03-18 21:15" "2017-03-18" "2017-03" "2017" */
+helpers.datetimeAsUnix = function (dt) {
+    return moment.utc(dt).unix();
+};
+
+/** dt should be local non-UTC datetime as "2017-03-18 21:15:45" "2017-03-18 21:15" "2017-03-18" "2017-03" "2017" */
+helpers.datetimeAsZeroBased = function (dt) {
+    return helpers.unixAsZeroBased(helpers.datetimeAsUnix(dt));
+};
+
+/** zb should be seconds from Year 0 in UTC, as Number or String */
+helpers.zeroBasedAsDatetime = function (zb) {
+    return moment.unix(helpers.zeroBasedAsUnix(zb)).utc().format("YYYY-MM-DD HH:mm:ss");
 };
 
 /** Generates a random integer between min and max */
