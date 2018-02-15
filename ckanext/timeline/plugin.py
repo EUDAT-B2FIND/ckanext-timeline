@@ -129,22 +129,22 @@ def timeline(context, request_data):
     # Handle open/'*' start and end points
     if start == '*':
         try:
-            with closing(ckan.lib.search.make_connection()) as con:
-                start = con.query(q,
-                                  fq=fq + ['{f}:[* TO *]'.format(f=START_FIELD)],
-                                  fields=['id', '{f}'.format(f=START_FIELD)],
-                                  sort=['{f} asc'.format(f=START_FIELD)],
-                                  rows=1).results[0][START_FIELD]
+            con = ckan.lib.search.make_connection()
+            start = con.search(q,
+                               fq=fq + ['{f}:[* TO *]'.format(f=START_FIELD)],
+                               fields=['id', '{f}'.format(f=START_FIELD)],
+                               sort=['{f} asc'.format(f=START_FIELD)],
+                               rows=1).docs[0][START_FIELD]
         except:
             raise ckan.logic.ValidationError({'start': _('Could not find start value from Solr')})
     if end == '*':
         try:
-            with closing(ckan.lib.search.make_connection()) as con:
-                end = con.query(q,
-                                fq=fq + ['{f}:[* TO *]'.format(f=END_FIELD)],
-                                fields=['id', '{f}'.format(f=END_FIELD)],
-                                sort=['{f} desc'.format(f=END_FIELD)],
-                                rows=1).results[0][END_FIELD]
+            con = ckan.lib.search.make_connection()
+            end = con.search(q,
+                             fq=fq + ['{f}:[* TO *]'.format(f=END_FIELD)],
+                             fields=['id', '{f}'.format(f=END_FIELD)],
+                             sort=['{f} desc'.format(f=END_FIELD)],
+                             rows=1).docs[0][END_FIELD]
         except:
             raise ckan.logic.ValidationError({'end': _('Could not find end value from Solr')})
 
@@ -209,12 +209,12 @@ def ps(t):
     :rtype: (int, int, int, int)
     '''
     s, e, m, q, fq = t
-    with closing(ckan.lib.search.make_connection()) as solr:
-        n = solr.query(q,
-                       fq=fq + ['{0}'.format(QUERY.format(s=s, e=e, sf=START_FIELD, ef=END_FIELD))],
-                       fields=['id'],
-                       rows=0)
-    found = int(n._numFound)
+    solr = ckan.lib.search.make_connection()
+    n = solr.search(q,
+                    fq=fq + ['{0}'.format(QUERY.format(s=s, e=e, sf=START_FIELD, ef=END_FIELD))],
+                    fields=['id'],
+                    rows=0)
+    found = n.hits
 
     return s, e, m, found
 
